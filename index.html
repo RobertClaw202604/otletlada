@@ -72,14 +72,13 @@
   }
   .gsec.open .gb { display: block; }
   .gsec .gb h3 {
-    font-size: 15.5px; margin: 22px 0 8px; color: var(--acc);
-    border-bottom: 1px solid var(--line); padding-bottom: 6px;
-  }
-  .gsec .gb h4 { font-size: 14.5px; margin: 18px 0 6px; }
-  .gsec .gb h2 {
     font-size: 16px; margin: 26px 0 8px; color: #fff;
     background: rgba(255,81,0,.10); border-left: 3px solid var(--acc);
     padding: 9px 12px; border-radius: 0 8px 8px 0;
+  }
+  .gsec .gb h4 {
+    font-size: 15px; margin: 20px 0 6px; color: var(--acc);
+    border-bottom: 1px solid var(--line); padding-bottom: 6px;
   }
   .gsec .gb p { margin: 9px 0; }
   .gsec .gb ul { margin: 9px 0 9px 2px; padding-left: 18px; }
@@ -411,11 +410,25 @@ function md(s) {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    /* táblázat: | a | b |  fejléc alatt |---|---| */
+    .replace(/(?:^|\n)\|(.+)\|\n\|[\s:\-|]+\|\n((?:\|.*\|(?:\n|$))*)/g, (all, head, body) => {
+      const th = head.split("|").map(x => x.trim()).filter(x => x !== "")
+        .map(x => "<th>" + x + "</th>").join("");
+      const rows = body.trim().split("\n").filter(x => x.trim()).map(r =>
+        "<tr>" + r.split("|").slice(1, -1).map(c => "<td>" + c.trim() + "</td>").join("") + "</tr>"
+      ).join("");
+      return "\n<table><thead><tr>" + th + "</tr></thead><tbody>" + rows + "</tbody></table>\n";
+    })
+    .replace(/^###\s+(.*)$/gm, "<h4>$1</h4>")
+    .replace(/^##\s+(.*)$/gm, "<h3>$1</h3>")
     .replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>")
     .replace(/(<li>[\s\S]*?<\/li>)/g, "<ul>$1</ul>")
+    .replace(/^\s*\d+\.\s+(.*)$/gm, "<li>$1</li>")
     .replace(/^---$/gm, "<hr>");
   h = h.split(/\n{2,}/).map(b =>
-    /^\s*<(ul|hr|h[1-6])/.test(b.trim()) ? b : "<p>" + b.replace(/\n/g, "<br>") + "</p>"
+    /^\s*<(ul|hr|h[1-6]|table|blockquote)/.test(b.trim())
+      ? b.replace(/(<\/(?:ul|table|h[1-6])>)(?=\s*<(?:ul|hr|h[1-6]|table|blockquote|p>))?/g, "$1")
+      : "<p>" + b.replace(/\n/g, "<br>") + "</p>"
   ).join("");
   return h;
 }

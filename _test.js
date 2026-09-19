@@ -246,6 +246,18 @@ function get(p) {
   ok("nincs JavaScript hiba", logs.length === 0);
   if (logs.length) console.log("\nHIBA-LOG:\n" + logs.join("\n"));
 
+  /* a markdown-rendelő táblázatot is kezel */
+  r = await ev("document.querySelectorAll('#guide .gsec .gb table').length");
+  ok("a táblázatok rendesen renderelődnek (" + r.val + "/2)", r.val === 2);
+  r = await ev("document.querySelectorAll('#guide .gsec .gb table th').length");
+  ok("a táblázatoknak fejlécük van (" + r.val + "/6)", r.val === 6);
+  r = await ev("document.querySelectorAll('#guide .gsec .gb table tr').length");
+  ok("a táblázatok sorai megjelennek (" + r.val + ")", r.val === 12);
+  r = await ev("document.querySelectorAll('#guide .gsec .gb h4').length");
+  ok("a szakaszcímek megjelennek (" + r.val + ")", r.val >= 30);
+  r = await ev("document.querySelectorAll('#guide .gsec .gb h3').length");
+  ok("a nagy csoportcímek megjelennek (" + r.val + ")", r.val >= 12);
+
   console.log(R.join("\n"));
   const bad = R.filter(x => x.startsWith("✗"));
   console.log("\n" + (R.length - bad.length) + "/" + R.length + " teszt sikeres");

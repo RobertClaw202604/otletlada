@@ -6,6 +6,12 @@
 
 ## ▶️ Indítás
 
+### 🌐 Online (bármely gépről, bármikor)
+
+**https://robertclaw202604.github.io/otletlada/** — ez az élő, megosztható cím.
+
+### 💻 Helyben (a gépeden)
+
 **Nyisd meg az `index.html`-t** dupla kattintással. Ennyi — fut böngészőben,
 nincs telepítés, nincs szerver.
 
@@ -100,7 +106,24 @@ Elég ennyi is: `{ szoveg: "..." }`.
 | **`index.html`** | **ezt nyisd meg** — a teljes felület |
 | **`projektek.js`** | **az adatok** — a projektek, feladatok, státuszok |
 | `OLVASS-EL.md` | ez a fájl |
+| `README.md` | rövid összefoglaló |
 | `_test.js` | automata teszt (36/36) — nem kell a használathoz |
+
+---
+
+## 🌐 Az online változat (GitHub)
+
+**Élő oldal:** https://robertclaw202604.github.io/otletlada/
+
+**Forráskód:** https://github.com/RobertClaw202604/otletlada
+
+A **`main` ág** tartalma jelenik meg az élő oldalon (GitHub Pages).
+Ha módosítasz valamit és feltöltöd, az oldal 1-2 percen belül frissül.
+
+⚠️ **Fontos:** az online oldalon a módosításaid **a te böngésződben**
+tárolódnak — ez nem egy szerver, hanem egy statikus oldal. Ezért van
+a **JSON / Markdown export**: amit véglegesíteni akarsz, küldd el nekem,
+és beírom a `projektek.js`-be. Akkor mindenkinél, minden gépen megjelenik.
 
 ---
 

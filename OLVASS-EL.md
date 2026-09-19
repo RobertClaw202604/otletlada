@@ -129,12 +129,12 @@ a **JSON / Markdown export**: amit véglegesíteni akarsz, küldd el nekem,
 
 ## Jelenlegi állapot (2026-09-19)
 
-**16 projekt/ötlet:**
+**17 projekt/ötlet:**
 - 🟢 Működő: **2** — ARworks, TabLog
 - 🔥 Elindított: **8** — KínaiAuto, DarwinAI, Emlékkönyv, Ex Libris Video,
   Egyéni Tanrend, Databike, CogniView, Ride to Race
 - 🔒 Zárt rendszer: **4** — DrinkDeal, SalesGenAI, EventAI, TenderRadar
-- 🆕 Ötlet: **2** — Vizsgáztató AI, Borászatok térképe
+- 🆕 Ötlet: **3** — Vizsgáztató AI, AI-tudás teszt (HR), Borászatok térképe
 
 Forrás: `knowledge/otletlada-v2.md`
 

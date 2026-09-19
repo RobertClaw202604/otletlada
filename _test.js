@@ -56,11 +56,11 @@ function get(p) {
   r = await ev("typeof PROJEKTEK !== 'undefined' && typeof STATUSZOK !== 'undefined'");
   ok("az adatfájl betöltött", r.val === true);
   r = await ev("PROJEKTEK.length");
-  ok("16 projekt/ötlet van betöltve (" + r.val + ")", r.val === 16);
+  ok("17 projekt/ötlet van betöltve (" + r.val + ")", r.val === 17);
 
   /* --- kártyák --- */
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("mind a 16 kártya renderelve", r.val === 16);
+  ok("mind a 17 kártya renderelve", r.val === 17);
   r = await ev("document.querySelectorAll('.chip').length");
   ok("5 szűrő-gomb (Összes + 4 státusz)", r.val === 5);
   r = await ev("document.getElementById('n-mukodo').textContent");
@@ -76,7 +76,7 @@ function get(p) {
   ok("a 🔒 zárt szűrő 4 kártyát ad (" + r.val + ")", r.val === 4);
   await ev("document.querySelector('.chip[data-f=\"otlet\"]').click()");
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("a 🆕 ötlet szűrő 2 kártyát ad (" + r.val + ")", r.val === 2);
+  ok("a 🆕 ötlet szűrő 3 kártyát ad (" + r.val + ")", r.val === 3);
   await ev("document.querySelector('.chip[data-f=\"mind\"]').click()");
 
   /* --- keresés ---
@@ -90,7 +90,7 @@ function get(p) {
   await ev("document.getElementById('search').value='';" +
            "document.getElementById('search').dispatchEvent(new Event('input'));");
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("a keresés törlése visszaadja mindet (" + r.val + ")", r.val === 16);
+  ok("a keresés törlése visszaadja mindet (" + r.val + ")", r.val === 17);
   r = await ev("SEARCH");
   ok("a keresés-állapot is kiürült", r.val === "");
 
@@ -147,7 +147,7 @@ function get(p) {
   r = await ev("document.getElementById('detail').classList.contains('on')");
   ok("a bezárás után a részletes nézet eltűnik", r.val === false);
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("a rács mind a 16 kártyát újrarajzolja", r.val === 16);
+  ok("a rács mind a 17 kártyát újrarajzolja", r.val === 17);
   r = await ev("document.getElementById('grid').innerHTML.length");
   ok("a rács ténylegesen újrarenderelődött (" + r.val + " karakter)", (r.val || 0) > 3000);
   r = await ev("Array.from(document.querySelectorAll('#grid .card')).some(c=>c.textContent.includes('hátra'))");

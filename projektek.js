@@ -331,6 +331,36 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
   },
   {
     id: "boraszat-terkep",
+    nev: "AI-tudás teszt (HR)",
+    statusz: "otlet",
+    kategoria: "HR / AI",
+    rovid: "Állásjelentkezok AI-tudásának mérése — a saját gépükön oldanak meg feladatot, a rendszer értékel.",
+    leiras: `**Állásjelentkezok AI-tudásának mérése a cégek HR-területére.** A jelölt az interjún **a saját gépén** old meg egy, a rendszer **böngészojében** kapott feladatot, és az eredményt oda másolja be.
+
+Közben **bármilyen AI-toolt** használhat, amelyet akar — épp ez a lényeg: nem az AI-tiltás a cél, hanem annak mérése, hogy **mennyire tudja használni**. Ez a mai munkakörök egyik legfontosabb készsége, és eddig senki nem méri.
+
+Az érték nem a felület, hanem a **rendszer knowhow-ja**:
+- **Feladatok kitalálása** — valós, munkakörhöz illo feladatok
+- **Feladat-adatbázis** — iparáganként / pozíciónként / nehézségi szintenként
+- **Variabilitás** — minden jelölt más feladatot kap, nem szivárog ki
+- **Beadás** — könnyen kezelheto, auditálható folyamat
+- **Értékelés** — az eredmény automatikus/minoségi megítélése, összehasonlítható pontszámmal
+
+**Miért most:** a HR-eseknek nincs eszközük az AI-kompetencia mérésére, miközben a jelentkezok 90%-a használ AI-t. Egy „AI-tudás" pontszám az önéletrajz mellé új, védheto kategória.
+
+🔗 **Kapcsolódás:** ugyanaz a vizsgáztató/értékelo mag, mint a **Vizsgáztató AI**-nál — közös technológia, két piac (oktatás / HR). A feladat-generálás és az AI-értékelés ugyanaz a probléma.
+
+⚠️ **Csak ötlet** — nincs mögötte speckó, üzleti modell vagy fejlesztés.
+
+**Nyitott kérdések:** Ki a vevő (HR-osztály vagy fejvadász ügynökség)? Hogyan bizonyítható, hogy a jelölt nem csalt? Mérheto-e egyáltalán a tudás, vagy csak az eszközhasználat? Árazás (nyilvános / céges elofizetés)?`,
+    hatralevo: [
+      { szoveg: "Teljes speckó", kesz: false },
+      { szoveg: "Üzleti modell (ki a vevő: HR vagy fejvadász?)", kesz: false },
+      { szoveg: "Kapcsolódás a Vizsgáztató AI motorjához", kesz: false }
+    ]
+  },
+  {
+    id: "boraszat-terkep",
     nev: "Borászatok interaktív térképe",
     statusz: "otlet",
     kategoria: "Bor / Térkép",

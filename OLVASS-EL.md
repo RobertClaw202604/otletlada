@@ -29,6 +29,30 @@ színezve (🟢 működő · 🔥 elindított · 🔒 zárt · 🆕 ötlet).
 
 ---
 
+## 📖 Szakmai alapok — a főoldal másik menüpontja
+
+A fejlécben a **📖 Szakmai alapok** gomb átvisz egy másik nézetre: ez **nem a
+te projektjeid listája**, hanem a **közös szakmai háttere** — mi az, amit
+minden digitális terméknél meg kell csinálni, és **milyen sorrendben**.
+
+Hat kinyitható szakasz:
+
+| # | Szakasz | Miről szól |
+|---|---|---|
+| 1 | 🧭 **A hét fázis** | Felfedezés → validálás → építés → bevezetés → növekedés → megtartás → skálázás |
+| 2 | 🏗️ **A nagy feladatcsoportok** | 12 csoport (A–L), a standard részfeladatokkal |
+| 3 | 📚 **Sikeres esettanulmányok** | Airbnb, Dropbox, Stripe, Slack, Notion, Superhuman, Basecamp |
+| 4 | 🔬 **Módszertan** | Lean Startup, Jobs to Be Done, Design Thinking, Business Model Canvas, AARRR |
+| 5 | 📋 **A javasolt sorrend** | Hat projekttípus, mindegyiknél a helyes útvonal |
+| 6 | ⚠️ **Ami kimarad** | A bukás hét tipikus oka |
+
+**Miért van ez az oldalon?** Hogy a kártyákon szereplő feladatok
+**ne ötletszerűek** legyenek, hanem egy ismert szakmai szerkezetet kövessenek.
+Ha egy kártyánál nem tudod, mi a következő lépés, itt megnézheted, mit mond a
+szakma.
+
+---
+
 ## 🎯 A nagy feladatok — minden projektnél ugyanaz a lista
 
 **Ez NEM választható lista!** Minden projektnél **mind a 14 nagy feladat

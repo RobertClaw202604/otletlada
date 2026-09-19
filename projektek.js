@@ -1,0 +1,349 @@
+/* ============================================================
+   projektek.js — a projektek és ötletek adatai
+   ============================================================
+
+   EZT A FÁJLT SZERKESZTHETED — a weboldal innen épül fel.
+
+   Egy projekt/ötlet szerkezete:
+
+   {
+     id: "arworks",                  // egyedi rövid azonosító
+     nev: "ARworks",                 // megjelenő név
+     url: "https://arworks.hu",      // opcionális
+     statusz: "mukodo",              // mukodo | elinditott | zart | otlet | parkolo | elvetve
+     kategoria: "Ügynökség / B2B",   // opcionális címke
+     rovid: "Egy soros lényeg.",     // a kártyán látszik
+     leiras: `Hosszabb leírás...`,   // a részletes nézetben
+     hatralevo: [                    // a még hátralévő feladatok
+       { szoveg: "...", kesz: false, felelos: "", datum: "" }
+     ],
+     megjegyzes: ""                  // szabad szöveg
+   }
+
+   A "hatralevo" lista elemeihez elég a "szoveg"; a többi mező opcionális.
+   A "kesz: true" elemet áthúzva, halványan jeleníti meg.
+
+   Ha egy projektnél nincs "hatralevo", a lista üresen jelenik meg, és
+   a felületen hozzá lehet adni.
+   ============================================================ */
+
+const STATUSZOK = {
+  mukodo:    { cimke: "Működő",        szin: "#2e9e5b", ikon: "🟢" },
+  elinditott:{ cimke: "Elindított",    szin: "#e08a00", ikon: "🔥" },
+  zart:      { cimke: "Zárt rendszer", szin: "#6b7280", ikon: "🔒" },
+  otlet:     { cimke: "Ötlet",         szin: "#FF5100", ikon: "🆕" },
+  parkolo:   { cimke: "Parkoló",       szin: "#3b82f6", ikon: "⏸️" },
+  elvetve:   { cimke: "Elvetve",       szin: "#9ca3af", ikon: "❌" }
+};
+
+/* A HÁTRALÉVŐ FELADATOK standard típusai — a felületen ezekből lehet választani */
+const FELADAT_TIPUSOK = [
+  "Teljes speckó",
+  "Üzleti modell",
+  "Kész szoftver",
+  "Publikálás",
+  "Láthatóság maximalizálás",
+  "Sales",
+  "Marketing",
+  "SEO",
+  "eDM / hírlevél",
+  "Hirdetés (Ads)",
+  "Tartalom / blog",
+  "Jogi / adatvédelem",
+  "Árazás",
+  "Partnerkapcsolat",
+  "Egyéb"
+];
+
+const PROJEKTEK = [
+
+  /* ==================== 🟢 MŰKÖDŐ ==================== */
+  {
+    id: "arworks",
+    nev: "ARworks",
+    url: "https://arworks.hu",
+    statusz: "mukodo",
+    kategoria: "Ügynökség / B2B",
+    rovid: "Egyedi VR, AR, 3D és AI megoldások üzleti célokra — 16 éve.",
+    leiras: `**Egyedi VR, AR, 3D és AI megoldások üzleti célokra.** B2B — tréning, értékesítés, kiállítások, promóció, digitális ügyfélkiszolgálás.
+
+A weboldal Budapesten, **2011 óta** fut. Egyedi fejlesztések, adaptálható platformok, kész szoftverek. Fő navigáció: Munkáink / Megoldások / Szolgáltatások / Szektorok / Technológiák / Tudástér / Rólunk. Belépő a **célból** indul: „Mit szeretne elérni?" (oktatás, termékbemutatás, látogatóbevonzás, értékesítés, promóció, AI-asszisztens, mobil/web, „még nem tudom").
+
+**Referenciák:** Medtronic (McGRATH VR-tréning, Quest 3 + AI páciensek), SAAB Gripen AR, Honda konfigurátor, V-Híd VR, AI-karakterek.
+
+**Tudásbázis:** 181 projekt magyar leírással, 32 angol leírással, YouTube-videókkal.`,
+    hatralevo: [
+      { szoveg: "Szerver-migráció (SEO-checklista kész)", kesz: false },
+      { szoveg: "12 hetes eDM kampány ügynökségeknek", kesz: false },
+      { szoveg: "Ügynökségi célcsoport bővítése (prospect-list)", kesz: false }
+    ]
+  },
+  {
+    id: "tablog",
+    nev: "TabLog",
+    url: "https://tablog.pro",
+    statusz: "mukodo",
+    kategoria: "SaaS / Munkaerő",
+    rovid: "Munkaidőnyilvántartás, vendégérkeztetés és beléptetés — mobillal.",
+    leiras: `**Munkaidőnyilvántartás, vendégérkeztetés és beléptetésmenedzsment** — mobillal, papír- és érintésmentesen. **6 éve** működik.
+
+Három termékvonal:
+- **TabLog Work** — munkaidőmérés mobillal, bárhonnan
+- **TabLog Visitor** — recepció nélküli, papírmentes vendégérkeztetés (irodai + irodaházi)
+- **Access Control** — kulcsnélküli beléptetés mobillal
+
+Nyelvek: HU / EN / DE. Árazás nyilvános. Ügyfélreferenciák a főoldalon.
+
+**Kapcsolat:** info@tablog.pro, +36 70 883 1821`,
+    hatralevo: []
+  },
+
+  /* ==================== 🔥 ELINDÍTOTT ==================== */
+  {
+    id: "kinaiauto",
+    nev: "KínaiAuto",
+    url: "https://www.kinaiauto.com",
+    statusz: "elinditott",
+    kategoria: "Autó / Portál",
+    rovid: "Független magyar kínai autó-iránytű — 78 modell, 14 márka.",
+    leiras: `**Független magyar nyelvű kínai autó-iránytű.** Kategória, ársáv és hajtás szerint szűrhető teljes hazai kínálat.
+
+**78 modell, 14 márka:** BAIC, BYD, Chery, Dongfeng, Firefly, Geely, Jaecoo, Leapmotor, Maxus, MG, NIO, Omoda, Voyah, XPENG.
+
+Élő szűrés (kategória, ársáv 0–71,2 M Ft, üzemanyag), modell-összehasonlítás, márkák, tudástár, **ajánlatkérés egy kattintással**. Ársávok 5–8 M Ft-tól 30 M Ft felettig. Rendezés ár / hossz / csomagtartó / hatótáv / teljesítmény szerint.
+
+**Kreatív:** 25 elem, Panda karakterrel, Nano Banana Pro-val generálva.`,
+    hatralevo: [
+      { szoveg: "3 kampányirány kidolgozása (ismertség / szándék / lead)", kesz: true },
+      { szoveg: "Google Ads anyagok készítése", kesz: false },
+      { szoveg: "Meta / FB hirdetések feltöltése (API)", kesz: false }
+    ]
+  },
+  {
+    id: "darwinai",
+    nev: "DarwinAI",
+    url: "https://darwinai.hu",
+    statusz: "elinditott",
+    kategoria: "AI / Oktatás",
+    rovid: "AI tanácsadás, oktatás és fejlesztés magyar vállalkozásoknak.",
+    leiras: `⚠️ **Domain:** \`darwinai.hu\` (a \`darwin.ai\` NEM az övé)
+
+**AI tanácsadás, AI oktatás, AI fejlesztés** magyar vállalkozásoknak. „Az AI az evolúció következő nagy ugrása."
+
+Három irány:
+- **AI tanácsadás** — stratégiától a megvalósításig
+- **AI oktatás és workshop** — gyakorlati, a saját feladataikon
+- **AI fejlesztés** — egyedi megoldások, automatizációk
+
+Van **6+1 modell**, Prezentációk, Projektek (62 publikált projekt/POC/vizuál), Hírlevél, **Prompt Library**, Partnerek & média, Referenciák, AI csapatépítő, Bio.
+
+**Darwin hírlevél:** külön rendszer — The Neuron + The Rundown AI forrásokból gyűjt, deduplikál, szelektál, Mailchimp-draftot készít.`,
+    hatralevo: [
+      { szoveg: "Teljes speckó", kesz: false },
+      { szoveg: "Hírlevél automatikus gyűjtés élesítése", kesz: true },
+      { szoveg: "Hírlevél-lista építése", kesz: false }
+    ]
+  },
+  {
+    id: "emlekkonyv",
+    nev: "Emlékkönyv",
+    url: "https://www.emlekkonyv.com",
+    statusz: "elinditott",
+    kategoria: "AI / Fogyasztói",
+    rovid: "AI-alapú életrajzíró — életed mozaikjait rendezi.",
+    leiras: `**AI-alapú életrajzíró.** AI beszélgetőtárs, amely segít felidézni és megőrizni a történeteidet.
+
+React SPA (Vite), Google Identity Services a Drive-integrációhoz (választható \`gdrive\` tárolási mód), Google Analytics (G-CX2V9WD4QH). Felhő tárolás.
+
+**Infrastruktúra:** Vercel (projekt: „life"), FB Messenger webhook (kulcsszavas auto-reply), FB App Review lezárva, adatvédelmi / terms / data-deletion oldalak megvannak.
+
+**Kampány:** Friends1 eDM-ek elküldve (5 fő), Friends2 vár. FB poszt kampány: 7 poszt + képek kész. Kommunikációs terv kész.`,
+    hatralevo: [
+      { szoveg: "Friends2 eDM kiküldése", kesz: false },
+      { szoveg: "FB poszt kampány indítása", kesz: false },
+      { szoveg: "Vercel Analytics bekapcsolása a dashboardon", kesz: false },
+      { szoveg: "Sales", kesz: false }
+    ]
+  },
+  {
+    id: "exlibris",
+    nev: "Ex Libris Video",
+    url: "https://exlibrisvideo.hu",
+    statusz: "elinditott",
+    kategoria: "AI / Könyv",
+    rovid: "Könyvespolc-videóból könyvkatalógus — ingyenes, regisztráció nélkül.",
+    leiras: `**Könyvespolc-videóból könyvkatalógus.** Telefonnal végigpásztázod a polcodat, az AI kiolvassa a gerinceket → böngészhető, szép katalógus saját linken, borítókkal, statisztikákkal, **Excel-exporttal**.
+
+„Ingyenes, regisztráció nélkül." Magyar ÉS idegen nyelvű könyvek felismerése. Feltöltés: MP4/MOV/WebM videó vagy JPEG/PNG/WebP fotó, fájlonként max 1 GB, összesen 30 fájl. Kollekciók kezelése, HU/EN felület.
+
+**Erősség:** ingyenes eszköz → vírusos potenciál, könyves/olvasós közösségek, SEO a könyvfelismerés témára.`,
+    hatralevo: [
+      { szoveg: "Teljes speckó", kesz: false },
+      { szoveg: "Publikálás / láthatóság", kesz: false },
+      { szoveg: "Marketing a könyves közösségekben", kesz: false }
+    ]
+  },
+  {
+    id: "egyenitanrend",
+    nev: "Egyéni Tanrend",
+    url: "https://egyenitanrend.hu",
+    statusz: "elinditott",
+    kategoria: "Oktatás / AI",
+    rovid: "AI-val támogatott tanulás magántanulóknak.",
+    leiras: `**AI-val támogatott tanulás magántanulóknak.**
+
+React SPA, mobilra optimalizálva (PWA-jellegű: theme-color, apple-mobile-web-app tagek). Technológiai stack: **Three.js** (3D), **KaTeX** (matematikai képletek), **Markdown** — tehát interaktív, matematika-orientált tanulási környezet.
+
+🔗 **Kapcsolódási pont:** a **Vizsgáztató AI** (lásd lent) ugyanebbe az oktatási irányba mutat — érdemes együtt gondolni rájuk.`,
+    hatralevo: [
+      { szoveg: "Üzleti modell", kesz: false },
+      { szoveg: "Láthatóság / SEO szülők felé", kesz: false }
+    ]
+  },
+  {
+    id: "databike",
+    nev: "Databike",
+    url: "https://databike.hu",
+    statusz: "elinditott",
+    kategoria: "Sport / Adatbázis",
+    rovid: "Magyar kerékpárverseny-eredmények és versenyzők adatbázisa.",
+    leiras: `**Magyar kerékpárverseny-eredmények és versenyzők** adatbázisa.
+
+Versenyek, versenyzők, klubok, versenysorozatok és statisztikák egy helyen. Sportágak: **MTB, cyclo-cross, BMX, országút**. Korosztály: **U7-től felnőttig**. SEO-ra optimalizált (robots index/follow, og:image, twitter card, canonical).
+
+👤 **Személyes kapcsolódás:** Szabolcs 10 éves fia, Marci komoly kerékpáros versenyző.`,
+    hatralevo: [
+      { szoveg: "SEO a versenyeredmény kulcsszavakra", kesz: false },
+      { szoveg: "Klubok / versenyzők bevonása, közösségépítés", kesz: false }
+    ]
+  },
+  {
+    id: "cogniview",
+    nev: "CogniView (VR CAP)",
+    url: "https://cogniview.hu",
+    statusz: "elinditott",
+    kategoria: "VR / Védelmi ipar",
+    rovid: "VR kognitív mérés WebXR-ben — védelmi, munkaalkalmassági, sportági.",
+    leiras: `**VR Cognitive Assessment Platform** — védelmi, munkaalkalmassági és sportági **kognitív mérés WebXR-ben**.
+
+Telepíthető webapp (manifest, PWA), WebXR-alapú. Technológia: Three.js + saját VR stack. Nemzetközi (EN) felület.
+
+**Szektor:** védelmi ipar, munkaalkalmasság, sport — illeszkedik az ARworks B2B profilhoz. Illeszkedik az **EDF pályázati** irányhoz is.`,
+    hatralevo: [
+      { szoveg: "Üzleti modell (B2B / B2G)", kesz: false },
+      { szoveg: "Szakmai publikációk, kiállítások", kesz: false },
+      { szoveg: "Kapcsolódás az EDF pályázathoz", kesz: false }
+    ]
+  },
+  {
+    id: "ridetorace",
+    nev: "Ride to Race",
+    url: "https://ridetorace.com",
+    statusz: "elinditott",
+    kategoria: "Sport / Oktatás (EN)",
+    rovid: "Parent Academy fiatal kerékpárosok versenyzéséhez — 6 nyelven.",
+    leiras: `**Parent Academy for Youth Cycling** — gyakorlati szülői útmutató fiatal kerékpárosok versenyzéséhez. „Nem adatbázis, hanem egy út, amelyet együtt jártok be."
+
+Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Articles, Clubs. 5 tanulási útvonal, **6 nyelv**. Ingyenes letölthető **Race-Day Checklist** (lead-mágnes!) → feliratkozás. Témák: pedálozás/kadencia, fékezés, váltás, kanyarvonal, rajt, emelkedő.
+
+👤 **Személyes kapcsolódás:** Marci versenyzése ihlette.
+
+⭐ **Ez a legkiforrottabb lead-tölcsér-logika** az egész portfólióban — érdemes mintaként használni a többinél.`,
+    hatralevo: [
+      { szoveg: "Láthatóság maximalizálása (nemzetközi)", kesz: false },
+      { szoveg: "Klubokkal partnerség", kesz: false }
+    ]
+  },
+
+  /* ==================== 🔒 ZÁRT RENDSZEREK ==================== */
+  {
+    id: "drinkdeal",
+    nev: "DrinkDeal",
+    url: "https://drinkdeal.hu",
+    statusz: "zart",
+    kategoria: "Bor / Kereskedelem",
+    rovid: "Zárt ital/bor kereskedelmi rendszer.",
+    leiras: `**Zárt (nem publikus) ital/bor kereskedelmi rendszer.** Nyilvános oldal nem elérhető — részletek Szabolcstól.
+
+🔗 **Kapcsolódás:** a **Borászatok térképe** ötlet adatforrása egy másik borászati rendszer (nem ez).`,
+    hatralevo: []
+  },
+  {
+    id: "salesgen",
+    nev: "SalesGenAI",
+    statusz: "zart",
+    kategoria: "Sales / AI",
+    rovid: "Proaktív cold-ajánlat-küldő sales rendszer.",
+    leiras: `**Proaktív cold-ajánlat-küldő sales rendszer** — felkutatás + egyedi ajánlat automatikus kiküldése.
+
+🔗 **Kapcsolódó:** A4C SalesGen projekt (Vas Zoltán, Lovable + Perplexity + Gemini, 20 000 Ft/h + ÁFA).`,
+    hatralevo: []
+  },
+  {
+    id: "eventai",
+    nev: "EventAI",
+    statusz: "zart",
+    kategoria: "Rendezvény / AI",
+    rovid: "Rendezvényszervezési AI rendszer.",
+    leiras: `**Rendezvényszervezési AI rendszer.** Részletek Szabolcstól.`,
+    hatralevo: []
+  },
+  {
+    id: "tenderradar",
+    nev: "TenderRadar",
+    statusz: "zart",
+    kategoria: "Pályázat / AI",
+    rovid: "Pályázatfigyelő / tender-radar rendszer.",
+    leiras: `**Pályázatfigyelő / tender-radar** rendszer. Részletek Szabolcstól — nagy potenciál, ha pályázati hírek automatizált figyelése + szűrése.
+
+🔗 **Kapcsolódás:** az **EDF pályázat** (SIMTRAIN-MSAI) partnerkeresése ugyanezt a problémát oldja meg kézzel.`,
+    hatralevo: []
+  },
+
+  /* ==================== 🆕 ÖTLETEK ==================== */
+  {
+    id: "vizsgaztato-ai",
+    nev: "Vizsgáztató AI",
+    statusz: "otlet",
+    kategoria: "Oktatás / AI",
+    rovid: "Szóbeli vizsgáztató AI — terem tele laptoppal, a diák szóban válaszol.",
+    leiras: `**A probléma:** a leadandó írásbeli feladatokat a diákok AI-val csinálják, ezért nem működnek. A megoldás: terem tele laptoppal, mindegyiken **vizsgáztató AI** fut, a diáknak **szóban** kell válaszolnia. Az élő szóbeli válasz nem pótolható otthonról AI-val.
+
+**Hol tartunk:**
+- ✅ Spec v0.2 kész
+- ✅ **Működő, letölthető mockup** a Drive-on (valódi DeepSeek-értékeléssel)
+- ✅ 24 tétel teljes tananyaggal, 206 checklist-pont, 6 demó vizsgázó
+- ✅ 5 vizsgáztató-variáns az A/B teszthez
+- ✅ Tesztelve: 41/41 · 41/41 · 21/21 · 4/4
+
+**Eddig ezzel akarunk eljutni** (Szabolcs, 2026-09-19) — a továbbvitel külön döntés.
+
+🔗 **Kapcsolódó:** Egyéni Tanrend.
+
+**Nyitott kérdések:** AI-értékelés megbízhatósága, jog/etika (adatzárás, átláthatóság), tanári felügyelet, teremzaj / egy-mikrofon kockázat, a % jogi súlya, felvétel megőrzése.`,
+    hatralevo: [
+      { szoveg: "V5 — valódi A/B teszt méréssel", kesz: false },
+      { szoveg: "Pilot kiválasztása (1 tantárgy, 1 évfolyam, 10–20 tétel)", kesz: false },
+      { szoveg: "Kész szoftver (backend proxy, kulcs a szerveren)", kesz: false },
+      { szoveg: "Kréta integráció (később)", kesz: false },
+      { szoveg: "Tanári admin felület", kesz: false }
+    ]
+  },
+  {
+    id: "boraszat-terkep",
+    nev: "Borászatok interaktív térképe",
+    statusz: "otlet",
+    kategoria: "Bor / Térkép",
+    rovid: "Teljes interaktív hazai borászati térkép a borvidékekkel és borászatokkal.",
+    leiras: `Van egy **másik** rendszerük (NEM az ARworks boros rendszere), amelyben gyűlnek a borászatok és boraik. Abból lehetne egy valódi, teljes interaktív hazai borászati térkép: a történelmi borvidékek mellett a borászatok is rajta.
+
+**Nyitott kérdések:** Melyik rendszer pontosan, van-e API/adatexport? Adatminőség/jogok? Célközönség? Üzleti modell?
+
+🔗 **Kapcsolódó:** DrinkDeal.`,
+    hatralevo: [
+      { szoveg: "Teljes speckó", kesz: false },
+      { szoveg: "Adatforrás tisztázása (melyik rendszer, van-e API)", kesz: false },
+      { szoveg: "Üzleti modell", kesz: false }
+    ]
+  }
+];

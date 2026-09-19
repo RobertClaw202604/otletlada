@@ -24,21 +24,37 @@ színezve (🟢 működő · 🔥 elindított · 🔒 zárt · 🆕 ötlet).
 
 **Rákattintasz egy kártyára** → megnyílik a részletes leírás:
 - a projekt teljes bemutatása
-- **🎯 Mi van még hátra** — a feladatlista
+- **🎯 Mi van még hátra** — a nagy feladatok és a részfeladatok
 - **📝 Megjegyzés** — ide írhatsz bármit
 
-**Feladatot írhatsz fel** közvetlenül a részletes nézetben:
-1. Válassz **típust** a legördülőből (Teljes speckó, Üzleti modell,
-   Kész szoftver, Publikálás, Láthatóság maximalizálás, Sales, Marketing,
-   SEO, eDM, Hirdetés, Tartalom, Jogi, Árazás, Partnerkapcsolat, Egyéb)
-2. Írd be, **mit kell megcsinálni**
-3. **+ Hozzáadás**
+---
 
-A kész feladatot bepipálod → áthúzva, a lista aljára kerül.
-A 🗑 gombbal törölhetsz.
+## 🎯 A nagy feladatok — minden projektnél ugyanaz a lista
 
-**A kártyán látod a haladást:** hány feladat van hátra, és egy zöld
-folyamatjelző sáv mutatja, mennyi készült el.
+**Ez NEM választható lista!** Minden projektnél **mind a 14 nagy feladat
+megjelenik**, és mindegyikhez külön tudsz részfeladatokat felvenni:
+
+> Teljes speckó · Üzleti modell · Kész szoftver · Publikálás ·
+> Láthatóság maximalizálás · Sales · Marketing · SEO · eDM / hírlevél ·
+> Hirdetés (Ads) · Tartalom / blog · Jogi / adatvédelem · Árazás ·
+> Partnerkapcsolat
+
+**Hogyan használod:**
+1. **Rákattintasz a nagy feladat nevére** → lenyílik
+2. **⬜ pipa** a nagy feladatnál → az egész blokk kész
+3. Alatta **részfeladatokat** veszel fel (pl. a *Marketing* alatt:\n   arculat, FB oldal, kampány)
+4. A **kis pipával** a részfeladatokat is kipipálod
+5. A fejlécen látszik, hány részfeladat kész (pl. `2/3`)
+
+**Új nagy feladatot is felvehetsz** — a lista alján: írd be (pl. „B2B sales"),
+és máris ott van. Ez **csak annál a projektnél** jelenik meg, és a 🗑 gombbal
+törölhető. A 14 fix blokk nem törölhető, mert azok minden projektnél kellenek.
+
+👉 Ha egy **új nagy feladatot minden projektnél** szeretnél, szólj — és
+beírom a `NAGY_FELADATOK` listába a `projektek.js`-ben.
+
+**A kártyán látod a haladást:** hány nagy feladat kész (pl. `3/14`),
+hány részfeladat van hátra, és egy zöld folyamatjelző sáv.
 
 **Szűrés és keresés:** a felső gombokkal státusz szerint szűrhetsz,
 a keresőmezőben pedig bármire kereshetsz (projektnév, leírás, feladat szövege).
@@ -81,21 +97,27 @@ Egy projekt így néz ki:
   kategoria: "Ügynökség / B2B",
   rovid: "Egy soros lényeg.",
   leiras: `Hosszabb leírás. **Félkövér** és \`kód\` is lehet benne.`,
-  hatralevo: [
-    { szoveg: "Szerver-migráció", tipus: "Publikálás", kesz: false },
-    { szoveg: "eDM kampány", tipus: "eDM / hírlevél", kesz: false }
+  hatralevo: [                  // a nagy feladat-blokkok
+    { feladat: "Teljes speckó", kesz: false },
+    { feladat: "Marketing", kesz: false, reszfeladatok: [
+        { szoveg: "Arculat", kesz: false },
+        { szoveg: "Facebook oldal", kesz: true }
+    ]}
   ],
   megjegyzes: ""
 }
 ```
 
-**Új projekt hozzáadása:** másolj le egy blokkot, és írd be a sajátját.
-A weboldal automatikusan felveszi.
+**⚠️ Fontos:** a `hatralevo` listában **mind a 14 nagy feladatnak szerepelnie
+kell** — a weboldal a `projektek.js`-ben lévő listát jeleníti meg. Ha kézzel
+írsz be újat, másold a `NAGY_FELADATOK` listából a nevét pontosan.
 
-**Új feladat:** a `hatralevo` listába egy új `{ szoveg: "...", tipus: "..." }`.
-Elég ennyi is: `{ szoveg: "..." }`.
+**Új részfeladat:** a `reszfeladatok` listába `{ szoveg: "...", kesz: false }`.
 
-**Új státusz:** a `STATUSZOK` objektumban vehetsz fel újat (szín + ikon + címke).
+**Új projekt hozzáadása:** másolj le egy teljes blokkot, és írd be a sajátját.
+
+**Új nagy feladat MINDEN projekthez:** a `NAGY_FELADATOK` listába vedd fel —
+de utána minden projekt `hatralevo` listájába is be kell írni.
 
 ---
 

@@ -145,6 +145,54 @@
   .task .del:hover { color: #e5484d; }
   .empty { color: var(--dim); font-size: 13.5px; font-style: italic; padding: 4px 0; }
 
+  /* ---------- nagy feladat-blokkok (fix listából) ---------- */
+  .blk {
+    border: 1px solid var(--line); border-radius: 11px; background: var(--panel2);
+    margin-bottom: 9px; overflow: hidden;
+  }
+  .blk-h {
+    display: flex; align-items: center; gap: 10px; padding: 11px 13px; cursor: pointer;
+    user-select: none;
+  }
+  .blk-h:hover { background: rgba(255,255,255,.02); }
+  .blk.open > .blk-h { border-bottom: 1px solid var(--line); }
+  .blk-h input[type=checkbox] {
+    accent-color: var(--ok); width: 16px; height: 16px; cursor: pointer; flex: none; margin: 0;
+  }
+  .blk-h .arw { color: var(--dim); font-size: 11px; width: 10px; flex: none; transition: .15s; }
+  .blk.open .blk-h .arw { transform: rotate(90deg); }
+  .blk-h .ttl { flex: 1; font-size: 14.5px; font-weight: 570; }
+  .blk.done .blk-h .ttl { text-decoration: line-through; color: var(--dim); opacity: .7; }
+  .blk-h .cnt {
+    font-size: 11.5px; color: var(--dim); border: 1px solid var(--line);
+    border-radius: 5px; padding: 1px 7px; white-space: nowrap; flex: none;
+  }
+  .blk-h .del {
+    background: none; border: none; color: var(--dim); font-size: 15px; padding: 0 2px;
+    flex: none; opacity: 0; transition: .12s;
+  }
+  .blk-h:hover .del { opacity: 1; }
+  .blk-h .del:hover { color: #e5484d; }
+  .blk-b { padding: 10px 13px 13px 34px; display: none; }
+  .blk.open .blk-b { display: block; }
+  .blk-b .addrow { margin-top: 9px; margin-left: 0; }
+
+  /* részfeladat */
+  .sub {
+    display: flex; align-items: flex-start; gap: 9px; padding: 7px 10px;
+    border-radius: 8px; margin-bottom: 5px; background: rgba(255,255,255,.025);
+  }
+  .sub input[type=checkbox] { margin-top: 2px; accent-color: var(--ok); width: 14px; height: 14px; cursor: pointer; flex: none; }
+  .sub .tx { flex: 1; font-size: 13.5px; }
+  .sub.done .tx { text-decoration: line-through; color: var(--dim); opacity: .6; }
+  .sub .del {
+    background: none; border: none; color: var(--dim); font-size: 14px; padding: 0 2px;
+    flex: none; opacity: 0; transition: .12s;
+  }
+  .sub:hover .del { opacity: 1; }
+  .sub .del:hover { color: #e5484d; }
+  .blk-b .empty { padding: 2px 0 2px 2px; }
+
   .addrow { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
   .addrow input, .addrow select {
     background: var(--panel2); border: 1px solid var(--line); color: var(--txt);
@@ -266,7 +314,8 @@ function mutate(id, fn) {
   if (!p) return;
   const cur = pdata(p);
   if (!OV[id]) OV[id] = {};
-  OV[id].hatralevo = cur.hatralevo.map(t => ({ ...t }));
+  /* mély másolat — különben a localStorage-ba írt szerkezet módosulna */
+  OV[id].hatralevo = JSON.parse(JSON.stringify(cur.hatralevo || []));
   OV[id].megjegyzes = cur.megjegyzes;
   fn(OV[id]);
   save();
@@ -291,13 +340,30 @@ function md(s) {
 /* ---- szűrés ---- */
 let FILTER = "mind", SEARCH = "";
 
+/* egy projekt összes részfeladatának szövege (kereséshez, számláláshoz) */
+function allTasks(d) {
+  const out = [];
+  (d.hatralevo || []).forEach(b => {
+    if (b.reszfeladatok) b.reszfeladatok.forEach(s => out.push({ ...s, blokk: b.feladat }));
+    else if (b.szoveg) out.push(b);   /* régi formátum */
+  });
+  return out;
+}
+/* egy projekt nyitott/kész részfeladatai */
+function taskStats(d) {
+  const all = allTasks(d);
+  const done = all.filter(t => t.kesz).length;
+  return { total: all.length, done: done, open: all.length - done };
+}
+
 function visible() {
   return PROJEKTEK.filter(p => {
     const d = pdata(p);
     if (FILTER !== "mind" && d.statusz !== FILTER) return false;
     if (SEARCH) {
       const hay = (d.nev + " " + d.rovid + " " + d.leiras + " " + (d.kategoria || "") + " " +
-        d.hatralevo.map(t => t.szoveg).join(" ")).toLowerCase();
+        (d.hatralevo || []).map(b => b.feladat + " " +
+          (b.reszfeladatok || []).map(s => s.szoveg).join(" ")).join(" ")).toLowerCase();
       if (!hay.includes(SEARCH.toLowerCase())) return false;
     }
     return true;
@@ -313,12 +379,12 @@ function render() {
   });
   Object.keys(cnt).forEach(k => { if ($("n-" + k)) $("n-" + k).textContent = cnt[k]; });
 
-  /* nyitott feladatok összesen */
+  /* nyitott/kész részfeladatok összesen */
   let openAll = 0, doneAll = 0;
-  PROJEKTEK.forEach(p => pdata(p).hatralevo.forEach(t => t.kesz ? doneAll++ : openAll++));
+  PROJEKTEK.forEach(p => { const s = taskStats(pdata(p)); openAll += s.open; doneAll += s.done; });
   $("subline").innerHTML = "Futó, épülő és jövőbeli ötletek egy helyen. Kattints a részletekért. " +
     "&nbsp;·&nbsp; <b>" + PROJEKTEK.length + "</b> projekt &nbsp;·&nbsp; " +
-    "<b style='color:var(--acc)'>" + openAll + "</b> nyitott feladat" +
+    "<b style='color:var(--acc)'>" + openAll + "</b> nyitott részfeladat" +
     (doneAll ? " &nbsp;·&nbsp; " + doneAll + " kész" : "");
 
   const list = visible();
@@ -330,19 +396,21 @@ function render() {
   g.innerHTML = list.map(p => {
     const d = pdata(p);
     const s = STATUSZOK[d.statusz] || STATUSZOK.otlet;
-    const open = d.hatralevo.filter(t => !t.kesz).length;
-    const done = d.hatralevo.filter(t => t.kesz).length;
-    const pct = d.hatralevo.length ? Math.round(done / d.hatralevo.length * 100) : 0;
+    const st = taskStats(d);
+    const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+    /* hány nagy blokk kész el / összesen */
+    const blkTotal = (d.hatralevo || []).length;
+    const blkDone = (d.hatralevo || []).filter(b => b.kesz).length;
     return '<div class="card" style="--sc:' + s.szin + '" onclick="openDetail(\'' + d.id + '\')">' +
       '<span class="st">' + s.ikon + ' ' + s.cimke + '</span>' +
       '<h3>' + d.nev + '</h3>' +
       '<div class="rovid">' + md(d.rovid).replace(/<\/?p>/g, "") + '</div>' +
-      (d.hatralevo.length
-        ? '<div class="prog"><i style="width:' + pct + '%"></i></div>' : "") +
+      (st.total ? '<div class="prog"><i style="width:' + pct + '%"></i></div>' : "") +
       '<div class="meta">' +
         (d.kategoria ? '<span class="badge">' + d.kategoria + '</span>' : "") +
-        (open ? '<span class="badge hi">' + open + ' hátra</span>'
-              : (d.hatralevo.length ? '<span class="badge">✓ kész</span>' : "")) +
+        '<span class="badge" title="Kész nagy feladat-blokkok">' + blkDone + '/' + blkTotal + ' feladat</span>' +
+        (st.open ? '<span class="badge hi">' + st.open + ' hátra</span>' :
+          (st.total ? '<span class="badge">✓ kész</span>' : "")) +
         (d.url ? '<span style="margin-left:auto">↗</span>' : "") +
       '</div></div>';
   }).join("");
@@ -367,15 +435,13 @@ function openDetail(id) {
     (d.url ? '<a class="url" href="' + d.url + '" target="_blank" rel="noopener">' + d.url + ' ↗</a>' : "") +
     '<div class="body-md" style="margin-top:12px">' + md(d.leiras) + '</div>' +
 
-    /* hátralevő feladatok */
+    /* hátralevő feladatok — FIX nagy blokkok */
     '<div class="sec"><h4>🎯 Mi van még hátra</h4>' +
-      '<div id="tasks">' + tasksHtml(d) + '</div>' +
+      '<div id="tasks">' + blocksHtml(d) + '</div>' +
       '<div class="addrow">' +
-        '<select id="newType">' + FELADAT_TIPUSOK.map(t =>
-          '<option>' + t + '</option>').join("") + '</select>' +
-        '<input id="newTask" placeholder="Mit kell megcsinálni?" ' +
-          'onkeydown="if(event.key===\'Enter\')addTask()">' +
-        '<button onclick="addTask()">+ Hozzáadás</button>' +
+        '<input id="newBlock" placeholder="Új nagy feladat, pl. B2B sales" ' +
+          'onkeydown="if(event.key===\'Enter\')addBlock()">' +
+        '<button onclick="addBlock()">+ Nagy feladat</button>' +
       '</div>' +
     '</div>' +
 
@@ -390,50 +456,111 @@ function openDetail(id) {
   document.body.style.overflow = "hidden";
 }
 
-function tasksHtml(d) {
-  if (!d.hatralevo.length) return '<p class="empty">Még nincs feladat felírva.</p>';
-  /* nyitottak elöl, készek hátul — de az EREDETI indexet visszük magunkkal,
-     különben a pipa és a törlés rossz elemre mutatna */
-  const idx = d.hatralevo.map((t, i) => ({ t, i })).sort((a, b) => (a.t.kesz ? 1 : 0) - (b.t.kesz ? 1 : 0));
-  return idx.map(({ t, i }) =>
-    '<div class="task' + (t.kesz ? " done" : "") + '">' +
-      '<input type="checkbox" ' + (t.kesz ? "checked" : "") +
-        ' onchange="toggleTask(' + i + ')">' +
-      '<div class="tx">' + t.szoveg.replace(/</g, "&lt;") + '</div>' +
-      (t.tipus ? '<span class="tp">' + t.tipus + '</span>' : "") +
-      '<button class="del" onclick="delTask(' + i + ')" title="Törlés">🗑</button>' +
-    '</div>').join("");
+/* ---------- a nagy feladat-blokkok ---------- */
+
+/* melyik blokk van nyitva (projektenként, csak a felület állapota) */
+const OPEN = {};
+
+function blocksHtml(d) {
+  const blocks = d.hatralevo || [];
+  if (!blocks.length) return '<p class="empty">Nincs feladat.</p>';
+  return blocks.map((b, i) => {
+    const subs = b.reszfeladatok || [];
+    const doneN = subs.filter(s => s.kesz).length;
+    const isOpen = OPEN[CURRENT + ":" + i];
+    return '<div class="blk' + (isOpen ? " open" : "") + (b.kesz ? " done" : "") + '" id="blk' + i + '">' +
+      '<div class="blk-h" onclick="toggleBlock(' + i + ', event)">' +
+        '<span class="arw">▶</span>' +
+        '<input type="checkbox" ' + (b.kesz ? "checked" : "") +
+          ' onclick="event.stopPropagation()" onchange="toggleBig(' + i + ')">' +
+        '<span class="ttl">' + b.feladat.replace(/</g, "&lt;") + '</span>' +
+        '<span class="cnt">' + (subs.length ? doneN + "/" + subs.length : "üres") + '</span>' +
+        (b.egyedi ? '<button class="del" onclick="event.stopPropagation();delBlock(' + i + ')" title="Törlés">🗑</button>' : "") +
+      '</div>' +
+      '<div class="blk-b">' +
+        (subs.length
+          ? subs.map((s, j) =>
+              '<div class="sub' + (s.kesz ? " done" : "") + '">' +
+                '<input type="checkbox" ' + (s.kesz ? "checked" : "") +
+                  ' onchange="toggleSub(' + i + ',' + j + ')">' +
+                '<div class="tx">' + s.szoveg.replace(/</g, "&lt;") + '</div>' +
+                '<button class="del" onclick="delSub(' + i + ',' + j + ')" title="Törlés">🗑</button>' +
+              '</div>').join("")
+          : '<p class="empty">Még nincs részfeladat.</p>') +
+        '<div class="addrow">' +
+          '<input id="sub' + i + '" placeholder="Részfeladat…" ' +
+            'onkeydown="if(event.key===\'Enter\')addSub(' + i + ')">' +
+          '<button onclick="addSub(' + i + ')">+ Részfeladat</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join("");
 }
 
-function refreshTasks() {
+function refreshBlocks() {
   const p = PROJEKTEK.find(x => x.id === CURRENT);
   if (!p) return;
-  const d = pdata(p);
-  $("tasks").innerHTML = tasksHtml(d);
+  $("tasks").innerHTML = blocksHtml(pdata(p));
   render();
-  const open = d.hatralevo.filter(t => !t.kesz).length;
-  toast(open ? open + " nyitott feladat" : "Minden feladat kész 🎉");
 }
 
-function toggleTask(i) {
-  /* i = az EREDETI tömb indexe (a rendezett megjelenítés ellenére is) */
+function toggleBlock(i, ev) {
+  /* a fejléc bárhol máshol kattintva nyit/zár (a pipa és a törlés kivétel) */
+  const key = CURRENT + ":" + i;
+  OPEN[key] = !OPEN[key];
+  const el = $("blk" + i);
+  if (el) el.classList.toggle("open", !!OPEN[key]);
+}
+function toggleBig(i) {
+  mutate(CURRENT, o => { if (o.hatralevo[i]) o.hatralevo[i].kesz = !o.hatralevo[i].kesz; });
+  refreshBlocks();
+}
+function toggleSub(i, j) {
   mutate(CURRENT, o => {
-    if (!o.hatralevo[i]) return;
-    o.hatralevo[i].kesz = !o.hatralevo[i].kesz;
+    const b = o.hatralevo[i];
+    if (b && b.reszfeladatok && b.reszfeladatok[j]) b.reszfeladatok[j].kesz = !b.reszfeladatok[j].kesz;
   });
-  refreshTasks();
+  refreshBlocks();
 }
-function delTask(i) {
-  mutate(CURRENT, o => { o.hatralevo.splice(i, 1); });
-  refreshTasks();
-}
-function addTask() {
-  const inp = $("newTask"), tp = $("newType");
+function addSub(i) {
+  const inp = $("sub" + i);
   const v = (inp.value || "").trim();
   if (!v) { inp.focus(); return; }
-  mutate(CURRENT, o => { o.hatralevo.push({ szoveg: v, tipus: tp.value, kesz: false }); });
+  mutate(CURRENT, o => {
+    const b = o.hatralevo[i];
+    if (!b) return;
+    if (!b.reszfeladatok) b.reszfeladatok = [];
+    b.reszfeladatok.push({ szoveg: v, kesz: false });
+  });
+  OPEN[CURRENT + ":" + i] = true;
+  refreshBlocks();
+  const n = $("sub" + i);
+  if (n) n.focus();
+  toast("Részfeladat hozzáadva");
+}
+function delSub(i, j) {
+  mutate(CURRENT, o => {
+    const b = o.hatralevo[i];
+    if (b && b.reszfeladatok) b.reszfeladatok.splice(j, 1);
+  });
+  refreshBlocks();
+}
+function addBlock() {
+  const inp = $("newBlock");
+  const v = (inp.value || "").trim();
+  if (!v) { inp.focus(); return; }
+  mutate(CURRENT, o => {
+    o.hatralevo.push({ feladat: v, kesz: false, reszfeladatok: [], egyedi: true });
+  });
   inp.value = "";
-  refreshTasks();
+  OPEN[CURRENT + ":" + (pdata(PROJEKTEK.find(x => x.id === CURRENT)).hatralevo.length - 1)] = true;
+  refreshBlocks();
+  toast("Nagy feladat hozzáadva");
+}
+function delBlock(i) {
+  mutate(CURRENT, o => { o.hatralevo.splice(i, 1); });
+  refreshBlocks();
+  toast("Nagy feladat törölve");
 }
 function saveNote(v) {
   mutate(CURRENT, o => { o.megjegyzes = v; });
@@ -482,9 +609,11 @@ function exportMd() {
       if (p.url) m += p.url + "\n\n";
       m += "> " + p.rovid + "\n\n";
       if (p.hatralevo.length) {
-        m += "**Hátralévő feladatok:**\n\n";
-        p.hatralevo.forEach(t =>
-          m += "- [" + (t.kesz ? "x" : " ") + "] " + t.szoveg + (t.tipus ? " _(" + t.tipus + ")_" : "") + "\n");
+        p.hatralevo.forEach(b => {
+          m += "- [" + (b.kesz ? "x" : " ") + "] **" + b.feladat + "**\n";
+          (b.reszfeladatok || []).forEach(s =>
+            m += "    - [" + (s.kesz ? "x" : " ") + "] " + s.szoveg + "\n");
+        });
         m += "\n";
       }
       if (p.megjegyzes) m += "**Megjegyzés:** " + p.megjegyzes + "\n\n";

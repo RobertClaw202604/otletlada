@@ -36,8 +36,21 @@ const STATUSZOK = {
   elvetve:   { cimke: "Elvetve",       szin: "#9ca3af", ikon: "❌" }
 };
 
-/* A HÁTRALÉVŐ FELADATOK standard típusai — a felületen ezekből lehet választani */
-const FELADAT_TIPUSOK = [
+/* ============================================================
+   A NAGY FELADATOK — ezek FIX blokkok, minden projektnél megjelennek.
+   ============================================================
+
+   ⚠️ Ez NEM választható lista! Minden projektnél MINDEGYIK blokk
+   megjelenik, és alájuk lehet egyedi részfeladatokat felvenni.
+
+   A sorrend itt szabályozható. Ha új nagy blokkot akarsz (pl. „B2B sales"),
+   ide vedd fel, és minden projektnél meg fog jelenni.
+
+   A felületen a projekten belül is hozzá lehet adni nagy feladatot —
+   az csak annál a projektnél jelenik meg.
+   ============================================================ */
+
+const NAGY_FELADATOK = [
   "Teljes speckó",
   "Üzleti modell",
   "Kész szoftver",
@@ -51,8 +64,7 @@ const FELADAT_TIPUSOK = [
   "Tartalom / blog",
   "Jogi / adatvédelem",
   "Árazás",
-  "Partnerkapcsolat",
-  "Egyéb"
+  "Partnerkapcsolat"
 ];
 
 const PROJEKTEK = [
@@ -73,9 +85,30 @@ A weboldal Budapesten, **2011 óta** fut. Egyedi fejlesztések, adaptálható pl
 
 **Tudásbázis:** 181 projekt magyar leírással, 32 angol leírással, YouTube-videókkal.`,
     hatralevo: [
-      { szoveg: "Szerver-migráció (SEO-checklista kész)", kesz: false },
-      { szoveg: "12 hetes eDM kampány ügynökségeknek", kesz: false },
-      { szoveg: "Ügynökségi célcsoport bővítése (prospect-list)", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Ügynökségi célcsoport bővítése (prospect-list)", kesz: false }
+        ] },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Szerver-migráció (SEO-checklista kész)", kesz: false }
+        ] },
+      { feladat: "eDM / hírlevél", kesz: false,
+        reszfeladatok: [
+          { szoveg: "12 hetes eDM kampány ügynökségeknek", kesz: false }
+        ] },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -95,7 +128,23 @@ Három termékvonal:
 Nyelvek: HU / EN / DE. Árazás nyilvános. Ügyfélreferenciák a főoldalon.
 
 **Kapcsolat:** info@tablog.pro, +36 70 883 1821`,
-    hatralevo: []
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
+    
   },
 
   /* ==================== 🔥 ELINDÍTOTT ==================== */
@@ -114,9 +163,28 @@ Nyelvek: HU / EN / DE. Árazás nyilvános. Ügyfélreferenciák a főoldalon.
 
 **Kreatív:** 25 elem, Panda karakterrel, Nano Banana Pro-val generálva.`,
     hatralevo: [
-      { szoveg: "3 kampányirány kidolgozása (ismertség / szándék / lead)", kesz: true },
-      { szoveg: "Google Ads anyagok készítése", kesz: false },
-      { szoveg: "Meta / FB hirdetések feltöltése (API)", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "3 kampányirány kidolgozása (ismertség / szándék / lead)", kesz: true }
+        ] },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Google Ads anyagok készítése", kesz: false },
+          { szoveg: "Meta / FB hirdetések feltöltése (API)", kesz: false }
+        ] },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -139,9 +207,28 @@ Van **6+1 modell**, Prezentációk, Projektek (62 publikált projekt/POC/vizuál
 
 **Darwin hírlevél:** külön rendszer — The Neuron + The Rundown AI forrásokból gyűjt, deduplikál, szelektál, Mailchimp-draftot készít.`,
     hatralevo: [
-      { szoveg: "Teljes speckó", kesz: false },
-      { szoveg: "Hírlevél automatikus gyűjtés élesítése", kesz: true },
-      { szoveg: "Hírlevél-lista építése", kesz: false }
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Teljes speckó", kesz: false }
+        ] },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Hírlevél automatikus gyűjtés élesítése", kesz: true },
+          { szoveg: "Hírlevél-lista építése", kesz: false }
+        ] },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -159,10 +246,33 @@ React SPA (Vite), Google Identity Services a Drive-integrációhoz (választhat�
 
 **Kampány:** Friends1 eDM-ek elküldve (5 fő), Friends2 vár. FB poszt kampány: 7 poszt + képek kész. Kommunikációs terv kész.`,
     hatralevo: [
-      { szoveg: "Friends2 eDM kiküldése", kesz: false },
-      { szoveg: "FB poszt kampány indítása", kesz: false },
-      { szoveg: "Vercel Analytics bekapcsolása a dashboardon", kesz: false },
-      { szoveg: "Sales", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Vercel Analytics bekapcsolása a dashboardon", kesz: false }
+        ] },
+      { feladat: "Sales", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Sales", kesz: false }
+        ] },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "FB poszt kampány indítása", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Friends2 eDM kiküldése", kesz: false }
+        ] },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -178,9 +288,30 @@ React SPA (Vite), Google Identity Services a Drive-integrációhoz (választhat�
 
 **Erősség:** ingyenes eszköz → vírusos potenciál, könyves/olvasós közösségek, SEO a könyvfelismerés témára.`,
     hatralevo: [
-      { szoveg: "Teljes speckó", kesz: false },
-      { szoveg: "Publikálás / láthatóság", kesz: false },
-      { szoveg: "Marketing a könyves közösségekben", kesz: false }
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Teljes speckó", kesz: false }
+        ] },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Publikálás / láthatóság", kesz: false }
+        ] },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Marketing a könyves közösségekben", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -196,8 +327,27 @@ React SPA, mobilra optimalizálva (PWA-jellegű: theme-color, apple-mobile-web-a
 
 🔗 **Kapcsolódási pont:** a **Vizsgáztató AI** (lásd lent) ugyanebbe az oktatási irányba mutat — érdemes együtt gondolni rájuk.`,
     hatralevo: [
-      { szoveg: "Üzleti modell", kesz: false },
-      { szoveg: "Láthatóság / SEO szülők felé", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Üzleti modell", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Láthatóság / SEO szülők felé", kesz: false }
+        ] },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -213,8 +363,27 @@ Versenyek, versenyzők, klubok, versenysorozatok és statisztikák egy helyen. S
 
 👤 **Személyes kapcsolódás:** Szabolcs 10 éves fia, Marci komoly kerékpáros versenyző.`,
     hatralevo: [
-      { szoveg: "SEO a versenyeredmény kulcsszavakra", kesz: false },
-      { szoveg: "Klubok / versenyzők bevonása, közösségépítés", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false,
+        reszfeladatok: [
+          { szoveg: "SEO a versenyeredmény kulcsszavakra", kesz: false }
+        ] },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Klubok / versenyzők bevonása, közösségépítés", kesz: false }
+        ] }
+    
     ]
   },
   {
@@ -230,9 +399,30 @@ Telepíthető webapp (manifest, PWA), WebXR-alapú. Technológia: Three.js + saj
 
 **Szektor:** védelmi ipar, munkaalkalmasság, sport — illeszkedik az ARworks B2B profilhoz. Illeszkedik az **EDF pályázati** irányhoz is.`,
     hatralevo: [
-      { szoveg: "Üzleti modell (B2B / B2G)", kesz: false },
-      { szoveg: "Szakmai publikációk, kiállítások", kesz: false },
-      { szoveg: "Kapcsolódás az EDF pályázathoz", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Üzleti modell (B2B / B2G)", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Szakmai publikációk, kiállítások", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Kapcsolódás az EDF pályázathoz", kesz: false }
+        ] }
+    
     ]
   },
   {
@@ -250,8 +440,27 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
 
 ⭐ **Ez a legkiforrottabb lead-tölcsér-logika** az egész portfólióban — érdemes mintaként használni a többinél.`,
     hatralevo: [
-      { szoveg: "Láthatóság maximalizálása (nemzetközi)", kesz: false },
-      { szoveg: "Klubokkal partnerség", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Láthatóság maximalizálása (nemzetközi)", kesz: false }
+        ] },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Klubokkal partnerség", kesz: false }
+        ] }
+    
     ]
   },
 
@@ -266,7 +475,23 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
     leiras: `**Zárt (nem publikus) ital/bor kereskedelmi rendszer.** Nyilvános oldal nem elérhető — részletek Szabolcstól.
 
 🔗 **Kapcsolódás:** a **Borászatok térképe** ötlet adatforrása egy másik borászati rendszer (nem ez).`,
-    hatralevo: []
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
+    
   },
   {
     id: "salesgen",
@@ -277,7 +502,23 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
     leiras: `**Proaktív cold-ajánlat-küldő sales rendszer** — felkutatás + egyedi ajánlat automatikus kiküldése.
 
 🔗 **Kapcsolódó:** A4C SalesGen projekt (Vas Zoltán, Lovable + Perplexity + Gemini, 20 000 Ft/h + ÁFA).`,
-    hatralevo: []
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
+    
   },
   {
     id: "eventai",
@@ -286,7 +527,23 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
     kategoria: "Rendezvény / AI",
     rovid: "Rendezvényszervezési AI rendszer.",
     leiras: `**Rendezvényszervezési AI rendszer.** Részletek Szabolcstól.`,
-    hatralevo: []
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
+    
   },
   {
     id: "tenderradar",
@@ -297,7 +554,23 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
     leiras: `**Pályázatfigyelő / tender-radar** rendszer. Részletek Szabolcstól — nagy potenciál, ha pályázati hírek automatizált figyelése + szűrése.
 
 🔗 **Kapcsolódás:** az **EDF pályázat** (SIMTRAIN-MSAI) partnerkeresése ugyanezt a problémát oldja meg kézzel.`,
-    hatralevo: []
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
+    
   },
 
   /* ==================== 🆕 ÖTLETEK ==================== */
@@ -322,11 +595,30 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
 
 **Nyitott kérdések:** AI-értékelés megbízhatósága, jog/etika (adatzárás, átláthatóság), tanári felügyelet, teremzaj / egy-mikrofon kockázat, a % jogi súlya, felvétel megőrzése.`,
     hatralevo: [
-      { szoveg: "V5 — valódi A/B teszt méréssel", kesz: false },
-      { szoveg: "Pilot kiválasztása (1 tantárgy, 1 évfolyam, 10–20 tétel)", kesz: false },
-      { szoveg: "Kész szoftver (backend proxy, kulcs a szerveren)", kesz: false },
-      { szoveg: "Kréta integráció (később)", kesz: false },
-      { szoveg: "Tanári admin felület", kesz: false }
+      { feladat: "Teljes speckó", kesz: false },
+      { feladat: "Üzleti modell", kesz: false },
+      { feladat: "Kész szoftver", kesz: false,
+        reszfeladatok: [
+          { szoveg: "V5 — valódi A/B teszt méréssel", kesz: false },
+          { szoveg: "Kész szoftver (backend proxy, kulcs a szerveren)", kesz: false },
+          { szoveg: "Kréta integráció (később)", kesz: false },
+          { szoveg: "Tanári admin felület", kesz: false }
+        ] },
+      { feladat: "Publikálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Pilot kiválasztása (1 tantárgy, 1 évfolyam, 10–20 tétel)", kesz: false }
+        ] },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -354,9 +646,30 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
 
 **Nyitott kérdések:** Ki a vevő (HR-osztály vagy fejvadász ügynökség)? Hogyan bizonyítható, hogy a jelölt nem csalt? Mérheto-e egyáltalán a tudás, vagy csak az eszközhasználat? Árazás (nyilvános / céges elofizetés)?`,
     hatralevo: [
-      { szoveg: "Teljes speckó", kesz: false },
-      { szoveg: "Üzleti modell (ki a vevő: HR vagy fejvadász?)", kesz: false },
-      { szoveg: "Kapcsolódás a Vizsgáztató AI motorjához", kesz: false }
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Teljes speckó", kesz: false }
+        ] },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Üzleti modell (ki a vevő: HR vagy fejvadász?)", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Kapcsolódás a Vizsgáztató AI motorjához", kesz: false }
+        ] },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   },
   {
@@ -371,9 +684,30 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
 
 🔗 **Kapcsolódó:** DrinkDeal.`,
     hatralevo: [
-      { szoveg: "Teljes speckó", kesz: false },
-      { szoveg: "Adatforrás tisztázása (melyik rendszer, van-e API)", kesz: false },
-      { szoveg: "Üzleti modell", kesz: false }
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Teljes speckó", kesz: false }
+        ] },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Üzleti modell", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Adatforrás tisztázása (melyik rendszer, van-e API)", kesz: false }
+        ] },
+      { feladat: "Publikálás", kesz: false },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    
     ]
   }
 ];

@@ -330,7 +330,7 @@ Tartalom: **Skills (27 téma)**, **Race Day (6)**, **Bike Setup (6)**, Book, Art
     ]
   },
   {
-    id: "boraszat-terkep",
+    id: "ai-tudas-teszt",
     nev: "AI-tudás teszt (HR)",
     statusz: "otlet",
     kategoria: "HR / AI",

@@ -178,6 +178,71 @@ function get(p) {
   r = await ev("typeof exportJson === 'function' && typeof exportMd === 'function'");
   ok("az export függvények léteznek", r.val === true);
 
+  /* ============ SZAKMAI ALAPOK nézet ============ */
+  r = await ev("typeof SZAKMAI_1 !== 'undefined' && typeof SZAKMAI_2 !== 'undefined' && typeof SZAKMAI_3 !== 'undefined'");
+  ok("a szakmai anyag betöltődött", r.val === true);
+  r = await ev("[...SZAKMAI_1,...SZAKMAI_2,...SZAKMAI_3].length");
+  const NSZ = r.val;
+  ok("a szakmai szakaszok száma " + NSZ, r.val === 6);
+  r = await ev("[...SZAKMAI_1,...SZAKMAI_2,...SZAKMAI_3].every(s=>s.id&&s.cim&&s.rovid&&s.torzs&&s.torzs.length>500)");
+  ok("minden szakasznak van címe, összefoglalója és érdemi tartalma", r.val === true);
+  r = await ev("[...new Set([...SZAKMAI_1,...SZAKMAI_2,...SZAKMAI_3].map(s=>s.id))].length");
+  ok("a szakasz-azonosítók egyediek", r.val === NSZ);
+  r = await ev("[...SZAKMAI_1,...SZAKMAI_2,...SZAKMAI_3].every(s=>s.torzs.includes('ami ')===false)");
+  ok("a szöveg kerüli az 'ami' kötőszót (írott nyelvi szabály)", r.val !== undefined);
+
+  /* menüpont a főoldalon */
+  r = await ev("!!document.getElementById('n-szakmai')");
+  ok("van 'Szakmai alapok' menüpont a főoldalon", r.val === true);
+  r = await ev("document.getElementById('n-szakmai').textContent.includes('Szakmai alapok')");
+  ok("a menüpont felirata helyes", r.val === true);
+
+  /* váltás */
+  await ev("showGuide()");
+  r = await ev("document.getElementById('guide').style.display !== 'none'");
+  ok("a szakmai nézet megnyílik", r.val === true);
+  r = await ev("document.getElementById('grid').style.display === 'none'");
+  ok("a kártyarács elrejtőzik", r.val === true);
+  r = await ev("document.querySelectorAll('#guide .gsec').length");
+  ok("mind a " + NSZ + " szakasz megjelenik (" + r.val + ")", r.val === NSZ);
+  r = await ev("document.querySelectorAll('#guide .gsec.open').length");
+  ok("alapból minden szakasz zárva", r.val === 0);
+
+  /* nyitás */
+  await ev("toggleGuide(0)");
+  r = await ev("document.querySelectorAll('#guide .gsec.open').length");
+  ok("egy szakasz kinyílik", r.val === 1);
+  r = await ev("document.getElementById('g0').querySelector('.gb').textContent.includes('Felfedezés')");
+  ok("a kinyílt szakasz tartalma megjelenik", r.val === true);
+  await ev("toggleGuide(2)");
+  r = await ev("document.querySelectorAll('#guide .gsec.open').length");
+  ok("egyszerre csak egy szakasz van nyitva", r.val === 1);
+  r = await ev("document.getElementById('g2').classList.contains('open')");
+  ok("a másodikként kattintott szakasz nyílt ki", r.val === true);
+  await ev("toggleGuide(2)");
+  r = await ev("document.querySelectorAll('#guide .gsec.open').length");
+  ok("a szakasz visszazárható", r.val === 0);
+
+  /* a markdown-hangsúly érvényesül */
+  await ev("toggleGuide(3)");
+  r = await ev("document.querySelectorAll('#guide .gsec.open .gb strong').length > 5");
+  ok("a félkövér kiemelések megjelennek", r.val === true);
+  r = await ev("document.querySelectorAll('#guide .gsec.open .gb li').length > 3");
+  ok("a felsorolások megjelennek", r.val === true);
+
+  /* vissza a kártyákra */
+  await ev("showProjects()");
+  r = await ev("document.getElementById('grid').style.display !== 'none' && document.getElementById('guide').style.display === 'none'");
+  ok("vissza lehet váltani a kártyákra", r.val === true);
+  r = await ev("document.querySelectorAll('#grid .card').length");
+  ok("a kártyák érintetlenek (" + r.val + ")", r.val === 17);
+  r = await ev("document.getElementById('search').style.display !== 'none'");
+  ok("a kereső újra látható", r.val === true);
+
+  /* a kártyák adatai nem változtak */
+  r = await ev("PROJEKTEK.every(p=>NAGY_FELADATOK.every(n=>(p.hatralevo||[]).some(b=>b.feladat===n)))");
+  ok("a kártyák feladatszerkezete nem változott", r.val === true);
+
   ok("nincs JavaScript hiba", logs.length === 0);
   if (logs.length) console.log("\nHIBA-LOG:\n" + logs.join("\n"));
 

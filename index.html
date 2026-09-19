@@ -48,6 +48,67 @@
   .chip:hover { border-color: #3d4454; }
   .chip.on { background: var(--acc); border-color: var(--acc); color: #fff; font-weight: 550; }
   .chip .n { opacity: .6; font-size: 12px; margin-left: 3px; }
+  .chip.navchip { background: #1d2433; border-color: #2b3550; }
+  .chip.navchip.on { background: var(--acc); border-color: var(--acc); }
+
+  /* ---- a Szakmai alapok nézet ---- */
+  .guide { max-width: 1000px; margin: 0 auto; }
+  .gsec {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .gsec > .gh {
+    display: flex; align-items: center; gap: 10px; padding: 16px 18px;
+    cursor: pointer; user-select: none;
+  }
+  .gsec > .gh:hover { background: rgba(255,255,255,.03); }
+  .gsec .garw { transition: transform .18s; font-size: 12px; opacity: .55; }
+  .gsec.open .garw { transform: rotate(90deg); }
+  .gsec .gt { font-weight: 650; font-size: 15.5px; flex: 1; }
+  .gsec .gsum { font-size: 13px; color: var(--mut); padding: 0 18px 12px; line-height: 1.55; }
+  .gsec .gb {
+    display: none; padding: 4px 20px 22px; border-top: 1px solid var(--line);
+    font-size: 14.2px; line-height: 1.72;
+  }
+  .gsec.open .gb { display: block; }
+  .gsec .gb h3 {
+    font-size: 15.5px; margin: 22px 0 8px; color: var(--acc);
+    border-bottom: 1px solid var(--line); padding-bottom: 6px;
+  }
+  .gsec .gb h4 { font-size: 14.5px; margin: 18px 0 6px; }
+  .gsec .gb h2 {
+    font-size: 16px; margin: 26px 0 8px; color: #fff;
+    background: rgba(255,81,0,.10); border-left: 3px solid var(--acc);
+    padding: 9px 12px; border-radius: 0 8px 8px 0;
+  }
+  .gsec .gb p { margin: 9px 0; }
+  .gsec .gb ul { margin: 9px 0 9px 2px; padding-left: 18px; }
+  .gsec .gb li { margin: 5px 0; }
+  .gsec .gb li::marker { color: var(--acc); }
+  .gsec .gb strong { color: #fff; }
+  .gsec .gb em { color: var(--mut); }
+  .gsec .gb code {
+    background: #0d1117; border: 1px solid var(--line); border-radius: 5px;
+    padding: 1px 5px; font-size: 12.5px;
+  }
+  .gsec .gb blockquote {
+    margin: 14px 0; padding: 12px 16px; background: rgba(255,81,0,.07);
+    border-left: 3px solid var(--acc); border-radius: 0 8px 8px 0;
+    font-style: italic; color: #e8e8ea;
+  }
+  .gsec .gb hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
+  .gsec .gb table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 13.2px; }
+  .gsec .gb th, .gsec .gb td {
+    border: 1px solid var(--line); padding: 8px 10px; text-align: left;
+    vertical-align: top;
+  }
+  .gsec .gb th { background: #1d2433; font-weight: 650; }
+  .gsec .gb tr:nth-child(even) td { background: rgba(255,255,255,.017); }
+  .guide .hint {
+    background: rgba(255,81,0,.08); border: 1px solid rgba(255,81,0,.25);
+    border-radius: 12px; padding: 13px 16px; font-size: 13.4px;
+    color: #f0e6df; line-height: 1.6; margin-bottom: 16px;
+  }
   #search {
     margin-left: auto; background: var(--panel); border: 1px solid var(--line);
     color: var(--txt); padding: 7px 13px; border-radius: 8px; font-size: 14px;
@@ -246,11 +307,30 @@
   <button class="chip" data-f="elinditott">🔥 Elindított <span class="n" id="n-elinditott"></span></button>
   <button class="chip" data-f="zart">🔒 Zárt <span class="n" id="n-zart"></span></button>
   <button class="chip" data-f="otlet">🆕 Ötlet <span class="n" id="n-otlet"></span></button>
+  <button class="chip" id="n-szakmai">📖 Szakmai alapok</button>
   <input id="search" type="search" placeholder="Keresés…">
 </div>
 
 <main>
   <div class="grid" id="grid"></div>
+
+  <div class="guide" id="guide" style="display:none">
+    <div class="hint">
+      <b>📖 Szakmai alapok — a szakma kerete.</b><br>
+      Ez a rész <b>nem a projektjeid listája</b>, hanem a közös szakmai háttere:
+      milyen fázisokon megy át minden digitális termék, milyen nagy feladatcsoportok
+      és részfeladatok jönnek elő minden esetben, és milyen sorrendben érdemes haladni.
+      Az egyes szakaszokra kattintva kinyílnak a részletek.
+    </div>
+    <div id="glist"></div>
+    <p style="color:var(--mut);font-size:13px;line-height:1.6;margin-top:18px">
+      Az anyag szakmai könyvek (Ries: <i>The Lean Startup</i>; Blank: <i>Four Steps of
+      the Epiphany</i>; Osterwalder: <i>Business Model Generation</i>; Cagan:
+      <i>Inspired</i>; Ries–Trout: <i>Positioning</i>) és nyilvánosan dokumentált
+      esettanulmányok alapján készült. A célja, hogy a kártyákon szereplő feladatok
+      <b>ne ötletszerűek</b> legyenek, hanem egy ismert szakmai szerkezetet kövessenek.
+    </p>
+  </div>
 </main>
 
 <footer>
@@ -271,6 +351,9 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="szakmai-1.js"></script>
+<script src="szakmai-2.js"></script>
+<script src="szakmai-3.js"></script>
 <script src="projektek.js"></script>
 <script>
 /* ============================================================
@@ -581,14 +664,64 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(
 
 /* ---- szűrő-gombok ---- */
 document.querySelectorAll(".chip").forEach(c => {
+  if (c.id === "n-szakmai") return;
   c.addEventListener("click", () => {
     document.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
     c.classList.add("on");
     FILTER = c.dataset.f;
+    showProjects();
     render();
   });
 });
 $("search").addEventListener("input", e => { SEARCH = e.target.value.trim(); render(); });
+
+/* ---- nézetváltás: kártyák <-> szakmai alapok ---- */
+let VIEW = "projects";
+
+function showProjects() {
+  VIEW = "projects";
+  $("grid").style.display = "";
+  $("guide").style.display = "none";
+  $("n-szakmai").classList.remove("on");
+  $("search").style.display = "";
+}
+
+function showGuide() {
+  VIEW = "guide";
+  $("grid").style.display = "none";
+  $("guide").style.display = "";
+  $("search").style.display = "none";
+  document.querySelectorAll(".chip").forEach(x => x.classList.remove("on"));
+  $("n-szakmai").classList.add("on");
+  $("subline").innerHTML = "📖 <b>Szakmai alapok</b> — a digitális termékek életciklusa, " +
+    "munkacsoportjai és módszertana. Kattints a szakaszokra a részletekért.";
+  if (!$("glist").childElementCount) renderGuide();
+}
+
+$("n-szakmai").addEventListener("click", showGuide);
+
+function renderGuide() {
+  const all = [...SZAKMAI_1, ...SZAKMAI_2, ...SZAKMAI_3];
+  $("glist").innerHTML = all.map((s, i) =>
+    '<div class="gsec" id="g' + i + '">' +
+      '<div class="gh" onclick="toggleGuide(' + i + ')">' +
+        '<span class="garw">▶</span>' +
+        '<span class="gt">' + s.cim + '</span>' +
+        '<span class="cnt">' + (i + 1) + '/' + all.length + '</span>' +
+      '</div>' +
+      '<div class="gsum">' + s.rovid + '</div>' +
+      '<div class="gb">' + md(s.torzs) + '</div>' +
+    '</div>').join("");
+}
+
+function toggleGuide(i) {
+  const el = $("g" + i);
+  if (!el) return;
+  const nyitva = el.classList.contains("open");
+  /* csak egy szakasz legyen nyitva */
+  $("glist").querySelectorAll(".gsec").forEach(x => x.classList.remove("open"));
+  if (!nyitva) el.classList.add("open");
+}
 
 /* ---- exportok ---- */
 function exportJson() {

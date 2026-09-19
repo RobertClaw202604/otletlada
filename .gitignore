@@ -1,3 +1,4 @@
 node_modules/
 package-lock.json
 _diag.js
+_livetest.js

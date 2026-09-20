@@ -715,7 +715,7 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
   {
     id: "zaszlo-abc",
     nev: "Hajózási zászló-ábécé fordító",
-    statusz: "otlet",
+    statusz: "mukodo",
     kategoria: "Mini web / Szórakozás",
     specko: "spec-zaszlo-abc.html",
     proba: "zaszlo-lobogas-proba.html",
@@ -751,26 +751,26 @@ Ez egy **tökéletes megosztható kis eszköz** — könnyen terjed („írd be 
 
 🔗 **Kapcsolódó:** Ötletláda, DarwinAI — ez is a megosztható, figyelmet hozó kategória.`,
     hatralevo: [
-      { feladat: "Teljes speckó", kesz: false,
+      { feladat: "Teljes speckó", kesz: true,
         reszfeladatok: [
-          { szoveg: "Melyik zászlókészlet (nemzetközi jelzőzászló / magyar folyami)", kesz: false },
-          { szoveg: "A három megjelenítési mód véglegesítése", kesz: false }
+          { szoveg: "Melyik zászlókészlet (nemzetközi jelzőzászló / magyar folyami)", kesz: true },
+          { szoveg: "A három megjelenítési mód véglegesítése", kesz: true }
         ] },
       { feladat: "Üzleti modell", kesz: false,
         reszfeladatok: [
           { szoveg: "Vezet-e ez át szolgáltatáskérésbe / kapcsolatfelvételbe", kesz: false }
         ] },
-      { feladat: "Kész szoftver", kesz: false,
+      { feladat: "Kész szoftver", kesz: true,
         reszfeladatok: [
-          { szoveg: "Zászlókészlet SVG-ben (26 betű + 10 számjegy)", kesz: false },
-          { szoveg: "Canvas-renderelő és a lobogás-animáció", kesz: false },
-          { szoveg: "A) sorban egymás mellett + PNG export", kesz: false },
-          { szoveg: "B) egyesével lépegető mód (sebességállítás)", kesz: false },
-          { szoveg: "C) videófelvétel MediaRecorder-rel (WebM)", kesz: false }
+          { szoveg: "Zászlókészlet SVG-ben (26 betű + 10 számjegy)", kesz: true },
+          { szoveg: "Canvas-renderelő és a lobogás-animáció", kesz: true },
+          { szoveg: "A) sorban egymás mellett + PNG export", kesz: true },
+          { szoveg: "B) egyesével lépegető mód (sebességállítás)", kesz: true },
+          { szoveg: "C) videófelvétel MediaRecorder-rel (WebM)", kesz: true }
         ] },
-      { feladat: "Publikálás", kesz: false,
+      { feladat: "Publikálás", kesz: true,
         reszfeladatok: [
-          { szoveg: "GitHub Pages-re kitelepítés (szerver nélkül fut)", kesz: false }
+          { szoveg: "GitHub Pages-re kitelepítés (szerver nélkül fut)", kesz: true }
         ] },
       { feladat: "Láthatóság maximalizálás", kesz: false },
       { feladat: "Sales", kesz: false },

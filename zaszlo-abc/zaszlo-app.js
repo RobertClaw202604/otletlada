@@ -178,25 +178,26 @@ function kepMentes(canvas) {
    A megjelenített WebGL-vásznak preserveDrawingBuffer: true van, így
    a kirajzolt kép visszaolvasható. Az exporthoz UGYANAZT a vásznat
    használjuk: kirajzoljuk a friss képet, majd másoljuk. */
-function exportSor(betuk, kepek, szelesseg, magassag, ido, beall, canvas) {
+function exportSor(betuk, kepek, szelesseg, magassag, ido, beall, canvas, zaszloMag) {
   const cv = canvas || cA;
+  const mag = zaszloMag || 170;
   const gl = cv.getContext("webgl", { alpha: true, premultipliedAlpha: false,
                                       preserveDrawingBuffer: true });
   if (!gl) return null;
   gl.clearColor(0.10, 0.14, 0.19, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
-  const t2 = sorTordeles(betuk, cv.width);
-  let y = 70, x = t2.perem, sorIdx = 0, sorban = 0;
+  const t2 = sorTordeles(betuk, cv.width, { zaszloMag: mag });
+  let y = 55, x = t2.perem, sorIdx = 0, sorban = 0;
   betuk.forEach(function (betu, i) {
     if (sorIdx < t2.sorok.length && sorban >= t2.sorok[sorIdx].length) {
-      sorIdx++; x = t2.perem; y += 170 + 140; sorban = 0;
+      sorIdx++; x = t2.perem; y += mag + 55 + 85; sorban = 0;
     }
     sorban++;
     if (!zaszloE(betu)) { x += t2.zaszloSz + t2.hezag; return; }
     const kep = kepek[betu];
     if (!kep) { x += t2.zaszloSz + t2.hezag; return; }
     lobogoZaszloGL(cv, kep, Math.round(x), Math.round(y),
-      t2.zaszloSz, 170, ido,
+      t2.zaszloSz, mag, ido,
       Object.assign({}, beall, { fazis: ((beall && beall.fazis) || 0) + (i % 5) * 0.42 }));
     x += t2.zaszloSz + t2.hezag;
   });

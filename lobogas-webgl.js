@@ -154,20 +154,20 @@ void main() {
   gl_FragColor = vec4(szin.rgb, szin.a * alfa);
 }`;
 
-/* ---- a WebGL-környezet (egyszer jön létre) ---- */
-let _gl = null, _program = null, _terulet = null;
-let _egyszer = null;
+/* ---- a WebGL-környezet (vásznanként külön!) ----
+   FONTOS: egy oldalon több vászon is lehet (A/B/C mód), mindegyik
+   SAJÁT WebGL-kontextussal. A program, a textúrák és a uniform-helyek
+   KONTEKSTUSHOS kötöttek — ezért vásznanként külön kell tárolni.
+   (Ha egyetlen közös _gl lenne, a második vásznon a program és a
+   textúra érvénytelen lenne: fekete blokk jelenne meg.) */
+const _motorok = new WeakMap();   /* canvas -> { gl, program, egyszer, texturak } */
 
 function glElokeszit(canvas) {
-  if (_gl && _gl.canvas === canvas) return true;
-  /* Ha MÁR van kontextus egy másik vásznon, és az export-renderhez
-     kell egy új: a régi kontextus megtartása mellett nem lehet
-     ugyanazt a programot/textúrát használni (azok kontextushoz
-     kötöttek). Ezért az export KÜLÖN, saját motort használ. */
+  const meglevo = _motorok.get(canvas);
+  if (meglevo) return true;
   const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false,
                                           preserveDrawingBuffer: true });
   if (!gl) return false;
-  _gl = gl;
 
   const program = gl.createProgram();
   for (const [tipus, forras] of [[gl.VERTEX_SHADER, CS_CS], [gl.FRAGMENT_SHADER, CS_FS]]) {
@@ -186,7 +186,6 @@ function glElokeszit(canvas) {
     return false;
   }
   gl.useProgram(program);
-  _program = program;
 
   /* egy négyszög, amely a teljes vásznat lefedi */
   const negy = gl.createBuffer();
@@ -203,7 +202,7 @@ function glElokeszit(canvas) {
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
   /* a uniform-helyek egyszer lekérve */
-  _egyszer = {
+  const _egyszer = {
     ido: gl.getUniformLocation(program, "ido"),
     amplitudo: gl.getUniformLocation(program, "amplitudo"),
     hullamhossz: gl.getUniformLocation(program, "hullamhossz"),
@@ -217,6 +216,7 @@ function glElokeszit(canvas) {
     terulet: gl.getUniformLocation(program, "terulet"),
     zaszlo: gl.getUniformLocation(program, "zaszlo")
   };
+  _motorok.set(canvas, { gl: gl, program: program, egyszer: _egyszer, texturak: new Map() });
   return true;
 }
 
@@ -225,10 +225,9 @@ function glElokeszit(canvas) {
    textúra-slot lenne, minden zászlóhoz újra fel kellene tölteni a
    képet (1200×800 RGBA ≈ 3,8 MB) — ez frame-enként 17 zászlónál
    ~65 MB feltöltést jelentene, ami 30 fps alá vinné a sebességet. */
-const _texturak = new Map();
-function glTextura(img) {
-  if (_texturak.has(img)) return _texturak.get(img);
-  const gl = _gl;
+function glTextura(motor, img) {
+  if (motor.texturak.has(img)) return motor.texturak.get(img);
+  const gl = motor.gl;
   const tex = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, tex);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
@@ -245,7 +244,7 @@ function glTextura(img) {
     const max = gl.getParameter(aniz.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
     gl.texParameterf(gl.TEXTURE_2D, aniz.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(16, max));
   }
-  _texturak.set(img, tex);
+  motor.texturak.set(img, tex);
   return tex;
 }
 
@@ -255,33 +254,35 @@ function glTextura(img) {
    ír színt (az UV-t a területre képezzük le egy viewport-tal). */
 function lobogoZaszloGL(canvas, img, x, y, sz, mag, t, beall) {
   if (!glElokeszit(canvas)) return false;
-  const gl = _gl;
+  const motor = _motorok.get(canvas);
+  const gl = motor.gl;
+  const egyszer = motor.egyszer;
   const b = beall ? Object.assign({}, LOB, beall) : LOB;
 
-  glTextura(img);
+  glTextura(motor, img);
 
   /* a viewport a zászló téglalapja — így az UV 0..1 pontosan oda képez */
   gl.viewport(x, canvas.height - (y + mag), sz, mag);
 
-  gl.useProgram(_program);
-  gl.uniform1f(_egyszer.ido, t);
-  gl.uniform1f(_egyszer.amplitudo, b.amplitudo);
-  gl.uniform1f(_egyszer.hullamhossz, b.hullamhossz);
-  gl.uniform1f(_egyszer.sebesseg, b.sebesseg);
-  gl.uniform1f(_egyszer.csillapitas, b.csillapitas);
-  gl.uniform1f(_egyszer.fodro, b.fodro);
-  gl.uniform1f(_egyszer.vetules, b.vetules);
-  gl.uniform1f(_egyszer.feny, b.feny ? 1 : 0);
-  gl.uniform1f(_egyszer.fazis, b.fazis);
+  gl.useProgram(motor.program);
+  gl.uniform1f(egyszer.ido, t);
+  gl.uniform1f(egyszer.amplitudo, b.amplitudo);
+  gl.uniform1f(egyszer.hullamhossz, b.hullamhossz);
+  gl.uniform1f(egyszer.sebesseg, b.sebesseg);
+  gl.uniform1f(egyszer.csillapitas, b.csillapitas);
+  gl.uniform1f(egyszer.fodro, b.fodro);
+  gl.uniform1f(egyszer.vetules, b.vetules);
+  gl.uniform1f(egyszer.feny, b.feny ? 1 : 0);
+  gl.uniform1f(egyszer.fazis, b.fazis);
   /* a perspektiva lehet logikai (true/false) vagy szám (0..2)
      — így a csúszka folyamatosan szabályozhatja */
-  gl.uniform1f(_egyszer.perspektiva,
+  gl.uniform1f(egyszer.perspektiva,
     b.perspektiva === true ? 1 : (b.perspektiva === false ? 0 : (b.perspektiva || 0)));
-  gl.uniform2f(_egyszer.terulet, sz, mag);
+  gl.uniform2f(egyszer.terulet, sz, mag);
 
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, glTextura(img));
-  gl.uniform1i(_egyszer.zaszlo, 0);
+  gl.bindTexture(gl.TEXTURE_2D, glTextura(motor, img));
+  gl.uniform1i(egyszer.zaszlo, 0);
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   return true;

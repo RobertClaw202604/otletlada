@@ -60,6 +60,11 @@
     bottom:12px; font-size:13px; color:rgba(255,255,255,.6); z-index:2;
     letter-spacing:2px; font-weight:650; }
 
+  /* a zászlók alatti betű-felirat az A) módban (külön réteg,
+     mert a WebGL-vászonra nem lehet 2D-s rajzolást tenni) */
+  .betuReteg { position:absolute; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:3; }
+
   /* csúszkák */
   .ctrl { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
     gap:12px; margin-top:16px; }
@@ -141,10 +146,12 @@
       <h2>A zászlósor</h2>
       <div class="stage">
         <canvas id="cvA" width="1980" height="390"></canvas>
+        <canvas id="cvAbetu" class="betuReteg"></canvas>
         <div class="fps" id="fpsA">—</div>
       </div>
       <div class="ctrl" id="ctrlA"></div>
       <div class="gombok">
+        <button id="betuGomb" class="mas">🔤 Betűk mutatása</button>
         <button id="pngA">PNG letöltése</button>
         <button id="pngA2" class="mas">PNG (fehér háttér)</button>
         <button id="linkA" class="mas">Link másolása</button>
@@ -164,7 +171,6 @@
       <h2>Betűnként</h2>
       <div class="stage">
         <canvas id="cvB" width="1400" height="700"></canvas>
-        <div class="feliratNagy" id="feliratB">A</div>
       </div>
       <div class="lepteto">
         <button id="vissza">◀ Előző</button>
@@ -242,6 +248,7 @@
    ============================================================ */
 
 const cA = document.getElementById("cvA");
+const cAbetu = document.getElementById("cvAbetu");
 const cB = document.getElementById("cvB");
 const cC = document.getElementById("cvC");
 const bevitel = document.getElementById("szo");
@@ -253,6 +260,8 @@ let betuk = [];            /* a lefordított szöveg karakterei */
 let kepek = {};            /* betű -> betöltött kép */
 let mod = "A";
 let t0 = performance.now();
+let zaszloMag = 170;       /* az A) mód zászlómagassága (méret-csúszka) */
+let betuLatszik = false;   /* mutassuk-e a betűket a zászlók alatt */
 
 /* ---------- csúszka-építő ---------- */
 function csuszkak(id, elemek) {
@@ -287,44 +296,32 @@ const KFOD = { cim: "Fodrozódás", kulcs: "fod", min: 0, max: 100, ertek: 30,
   kepernyo: v => (v / 100).toFixed(2), beall: v => { LOB.fodro = v / 100; } };
 const KPER = { cim: "Mélység-torzítás", kulcs: "per", min: 0, max: 200, ertek: 100,
   kepernyo: v => (v / 100).toFixed(2), beall: v => { LOB.perspektiva = v / 100; } };
+/* zászlóméret: minél kisebb, annál több fér el egy sorban. 40%-nál
+   egy 20-30 zászlós szó is kifér egyetlen sorban. */
+const KMER = { cim: "Zászlóméret", kulcs: "mer", min: 6, max: 100, ertek: 34,
+  kepernyo: v => v + "%",
+  beall: v => { zaszloMag = Math.round(170 * v / 34); meretez(); } };
 
-function alapCsuszkak(id) { csuszkak(id, [KAT, KHUL, KSEB, KFOD, KPER]); }
+function alapCsuszkak(id) { csuszkak(id, [KMER, KAT, KHUL, KSEB, KFOD, KPER]); }
 alapCsuszkak("ctrlA");
 alapCsuszkak("ctrlB");
 
-/* ---------- fordítás + képbetöltés ---------- */
+/* ---------- fordítás ---------- */
 function frissit() {
   const nyers = bevitel.value;
   betuk = fordit(nyers, 40);
   hosszKi.textContent = betuk.length;
   zaszloKi.textContent = betuk.filter(zaszloE).length;
 
-  /* a sor mérete: tördelve, ha nem fér ki. A vászon szélessége a
-     LEGHOSSZABB tényleges sorhoz igazodik (nem a maximális darabszámhoz),
-     így rövid szövegnél nem marad felesleges üres sáv. */
-  const maxSzel = 1900;
-  const t = sorTordeles(betuk, maxSzel);
-  const sorokSzam = t.sorok.length;
-  const sorMag = 170 + 70 * 2;
-  let leghosszabb = 0;
-  t.sorok.forEach(function (s) {
-    if (s.length > leghosszabb) leghosszabb = s.length;
-  });
-  cA.width = t.perem * 2 + (leghosszabb * t.zaszloSz + Math.max(0, leghosszabb - 1) * t.hezag);
-  cA.height = sorokSzam * sorMag;
+  meretez();
 
-  if (!betuk.filter(zaszloE).length) {
-    hibaKi.style.display = "none";
-  } else {
-    hibaKi.style.display = "none";
-  }
+  hibaKi.style.display = "none";
 
   szoAzUrlben(nyers);
 
   /* a B) léptető mutatóját az új szöveghez igazítjuk (különben
-     a régi pozíción marad, és a felirat nem frissül) */
+     a régi pozíción marad) */
   if (mutato > betuk.length - 1) mutato = Math.max(0, betuk.length - 1);
-  document.getElementById("feliratB").textContent = betuk[mutato] || " ";
 
   kepekBetolt(betuk, 1200).then(function (tar) {
     kepek = tar;
@@ -337,6 +334,29 @@ function frissit() {
   /* a C) előnézet újraméretezése */
   cC.width = parseInt(document.getElementById("vFelbontas").value.split("x")[0], 10);
   cC.height = parseInt(document.getElementById("vFelbontas").value.split("x")[1], 10);
+}
+
+/* ---------- a vásznak méretezése (méret-csúszka) ----------
+   A cél: minél kisebb a zászló, annál több fér el EGY sorban.
+   Ezért a tördelés max. szélessége a mérettel együtt nő: kicsi
+   zászlóknál egy 20-30 zászlós szó is kifér egyetlen sorban. */
+function meretez() {
+  const egyZaszlo = zaszloMag * (FLAG_W / FLAG_H);
+  const hezag = Math.round(egyZaszlo * 0.07);
+  /* a rendelkezésre álló hely a kártyában (a CSS max. 1080 px, a
+     vászon 100% széles) — ezt vesszük egy sor maximumának */
+  const maxSzel = Math.max(1200, Math.round(1080 * 1.8));
+  const t = sorTordeles(betuk, maxSzel, { zaszloMag: zaszloMag });
+  const sorokSzam = Math.max(1, t.sorok.length);
+  let leghosszabb = 0;
+  t.sorok.forEach(function (s) {
+    if (s.length > leghosszabb) leghosszabb = s.length;
+  });
+  /* a vászon pontosan a leghosszabb sor szélessége legyen */
+  cA.width = Math.max(320,
+    t.perem * 2 + leghosszabb * egyZaszlo + Math.max(0, leghosszabb - 1) * hezag);
+  cA.height = sorokSzam * (zaszloMag + 55 + 85);
+  if (cAbetu) { cAbetu.width = cA.width; cAbetu.height = cA.height; }
 }
 
 /* ---------- B) pontjelző ---------- */
@@ -353,7 +373,6 @@ function pontEpit() {
 }
 function mutatoAllit(i) {
   mutato = Math.max(0, Math.min(betuk.length - 1, i));
-  document.getElementById("feliratB").textContent = betuk[mutato] || " ";
   pontEpit();
 }
 
@@ -368,22 +387,52 @@ function rajzolA(t) {
   if (!gl) return;
   gl.clearColor(0.10, 0.14, 0.19, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
-  const t2 = sorTordeles(betuk, 1900);
-  let y = 70;
+  const t2 = sorTordeles(betuk, Math.max(1200, Math.round(1080 * 1.8)), { zaszloMag: zaszloMag });
+  let y = 55;
   let x = t2.perem;
   let sorIdx = 0;
   let sorban = 0;
+  const celok = [];   /* a betű-feliratok helye */
   betuk.forEach(function (betu, i) {
-    if (sorban >= t2.sorok[sorIdx].length) { sorIdx++; x = t2.perem; y += 170 + 140; sorban = 0; }
+    if (sorban >= t2.sorok[sorIdx].length) {
+      sorIdx++; x = t2.perem; y += zaszloMag + 55 + 85; sorban = 0;
+    }
     sorban++;
-    if (!zaszloE(betu)) { x += t2.zaszloSz + t2.hezag; return; }
-    const kep = kepek[betu];
-    if (!kep) { x += t2.zaszloSz + t2.hezag; return; }
-    const fazisElt = (i % 5) * 0.42;
-    lobogoZaszloGL(cA, kep, Math.round(x), Math.round(y),
-      t2.zaszloSz, 170, t, { fazis: (LOB.fazis || 0) + fazisElt });
+    const van = zaszloE(betu);
+    if (van) {
+      const kep = kepek[betu];
+      if (kep) {
+        const fazisElt = (i % 5) * 0.42;
+        lobogoZaszloGL(cA, kep, Math.round(x), Math.round(y),
+          t2.zaszloSz, zaszloMag, t, { fazis: (LOB.fazis || 0) + fazisElt });
+      }
+    }
+    celok.push({ x: Math.round(x + t2.zaszloSz / 2), y: Math.round(y + zaszloMag),
+                 s: betu, van: van });
     x += t2.zaszloSz + t2.hezag;
   });
+  /* a betűk a zászlók ALATT, nagyban — külön 2D-s rétegre
+     (a WebGL-vászonra nem lehet 2D-s rajzolást tenni) */
+  if (cAbetu.width !== cA.width || cAbetu.height !== cA.height) {
+    cAbetu.width = cA.width;
+    cAbetu.height = cA.height;
+  }
+  const ctx = cAbetu.getContext("2d");
+  ctx.clearRect(0, 0, cAbetu.width, cAbetu.height);
+  if (betuLatszik) {
+    const fs = Math.max(22, Math.round(zaszloMag * 0.52));
+    ctx.font = "700 " + fs + "px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillStyle = "rgba(255,255,255,.94)";
+    ctx.shadowColor = "rgba(0,0,0,.65)";
+    ctx.shadowBlur = 10;
+    celok.forEach(function (c) {
+      if (!c.van) return;
+      ctx.fillText(c.s, c.x, c.y + 12);
+    });
+    ctx.shadowBlur = 0;
+  }
 }
 
 /* ---------- B) egy zászló ---------- */
@@ -401,9 +450,24 @@ function rajzolB(t) {
   if (!zaszloE(betu)) return;
   const kep = kepek[betu];
   if (!kep) return;
-  const mag = 420, szel = Math.round(mag * (FLAG_W / FLAG_H));
+  /* a zászló a vászon jó részét kitölti (a méret-csúszka itt is hat) */
+  const mag = Math.min(560, Math.round(zaszloMag * 2.6));
+  const szel = Math.round(mag * (FLAG_W / FLAG_H));
   lobogoZaszloGL(cB, kep, Math.round((cB.width - szel) / 2),
-    Math.round((cB.height - mag) / 2), szel, mag, t);
+    Math.round((cB.height - mag) / 2) - 30, szel, mag, t);
+  /* a betű a zászló ALATT, nagyban, a 2D-s rétegre (nem takar) */
+  const ctx = cB.getContext("2d");
+  if (ctx) {
+    ctx.clearRect(0, 0, cB.width, cB.height);
+    ctx.font = "700 150px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(255,255,255,.92)";
+    ctx.shadowColor = "rgba(0,0,0,.6)";
+    ctx.shadowBlur = 18;
+    ctx.fillText(betu, cB.width / 2, cB.height - 95);
+    ctx.shadowBlur = 0;
+  }
 }
 
 /* ---------- C) videó-jelenet ---------- */
@@ -483,12 +547,17 @@ document.getElementById("torles").onclick = function () {
 };
 
 /* ---------- A) exportok ---------- */
+document.getElementById("betuGomb").onclick = function () {
+  betuLatszik = !betuLatszik;
+  this.classList.toggle("on", betuLatszik);
+  this.textContent = betuLatszik ? "🔤 Betűk elrejtése" : "🔤 Betűk mutatása";
+};
 document.getElementById("pngA").onclick = function () {
-  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB);
+  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB, null, zaszloMag);
   pngExport(cA, "zaszlosor-" + (bevitel.value.trim() || "szoveg") + ".png", false, src);
 };
 document.getElementById("pngA2").onclick = function () {
-  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB);
+  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB, null, zaszloMag);
   pngExport(cA, "zaszlosor-feher-" + (bevitel.value.trim() || "szoveg") + ".png", true, src);
 };
 document.getElementById("linkA").onclick = function () {

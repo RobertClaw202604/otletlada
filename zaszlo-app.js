@@ -174,16 +174,18 @@ function kepMentes(canvas) {
   return _mento;
 }
 
-/* ---- 7b. Export-render: külön vászonra, preserveDrawingBuffer-rel ---- */
-function exportSor(betuk, kepek, szelesseg, magassag, ido, beall) {
-  const cv = document.createElement("canvas");
-  cv.width = szelesseg; cv.height = magassag;
+/* ---- 7b. Export-render ----
+   A megjelenített WebGL-vásznak preserveDrawingBuffer: true van, így
+   a kirajzolt kép visszaolvasható. Az exporthoz UGYANAZT a vásznat
+   használjuk: kirajzoljuk a friss képet, majd másoljuk. */
+function exportSor(betuk, kepek, szelesseg, magassag, ido, beall, canvas) {
+  const cv = canvas || cA;
   const gl = cv.getContext("webgl", { alpha: true, premultipliedAlpha: false,
                                       preserveDrawingBuffer: true });
   if (!gl) return null;
   gl.clearColor(0.10, 0.14, 0.19, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
-  const t2 = sorTordeles(betuk, szelesseg);
+  const t2 = sorTordeles(betuk, cv.width);
   let y = 70, x = t2.perem, sorIdx = 0, sorban = 0;
   betuk.forEach(function (betu, i) {
     if (sorIdx < t2.sorok.length && sorban >= t2.sorok[sorIdx].length) {

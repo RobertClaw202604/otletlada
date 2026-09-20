@@ -360,7 +360,7 @@ function mutatoAllit(i) {
 /* ---------- A) sor rajzolása ---------- */
 let _glA = null;
 function glA() {
-  if (!_glA) _glA = cA.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+  if (!_glA) _glA = cA.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
   return _glA;
 }
 function rajzolA(t) {
@@ -389,7 +389,7 @@ function rajzolA(t) {
 /* ---------- B) egy zászló ---------- */
 let _glB = null;
 function glB() {
-  if (!_glB) _glB = cB.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+  if (!_glB) _glB = cB.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
   return _glB;
 }
 function rajzolB(t) {
@@ -410,7 +410,7 @@ function rajzolB(t) {
 let cAllapot = { feny: false, hatter: "dark", hossz: 5.0, kezdet: 0 };
 let _glC = null;
 function glC() {
-  if (!_glC) _glC = cC.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+  if (!_glC) _glC = cC.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
   return _glC;
 }
 function rajzolC(t) {

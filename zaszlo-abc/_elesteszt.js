@@ -34,7 +34,8 @@ function ell(nev,jo){ if(jo){ok++;console.log("✓ "+nev);} else {hiba++;console
 
   ell("az éles oldal betöltött", (await ev("!!document.getElementById('szo')")).val === true);
   ell("a motor betöltött (LOB)", (await ev("typeof LOB === 'object'")).val === true);
-  ell("a zászlórajzok betöltöttek (36)", (await ev("typeof flags === 'object' && Object.keys(flags).length >= 30")).val === true);
+  ell("a zászlórajzok betöltöttek (36)", (await ev("typeof BETUK !== 'undefined' && BETUK.length >= 30")).val === true);
+  ell("a zászlórajzoló működik", (await ev("typeof flagDataUri === 'function' && String(flagDataUri('A',40)).startsWith('data:image/svg')")).val === true);
   ell("az app betöltött (fordit)", (await ev("typeof fordit === 'function'")).val === true);
 
   const m = await ev(`(function(){
@@ -49,8 +50,8 @@ function ell(nev,jo){ if(jo){ok++;console.log("✓ "+nev);} else {hiba++;console
   ell("az éles oldalon kirajzolódik a zászlósor (" + m.val + " pixel)", m.val > 100000);
 
   const fps = await ev("document.getElementById('fpsA').textContent");
-  ell("az fps-mutató működik (" + fps.val + ")", /\\d+ fps/.test(fps.val || ""));
-  const fpsszam = parseInt((fps.val||"0").replace(/\\D/g,""),10);
+  ell("az fps-mutató működik (" + fps.val + ")", /[0-9]+ fps/.test(fps.val || ""));
+  const fpsszam = parseInt((fps.val||"0").replace(/[^0-9]/g,""),10);
   ell("a sebesség legalább 40 fps (mért: " + fpsszam + ")", fpsszam >= 40);
 
   await ev(`(function(){const e=document.getElementById('szo');e.value='ARWORKS';e.dispatchEvent(new Event('input'));})()`);

@@ -155,14 +155,15 @@ void main() {
 }`;
 
 /* ---- a WebGL-környezet (egyszer jön létre) ---- */
-let _gl = null, _program = null, _textura = null, _terulet = null;
-let _egyszer = null, _keszKep = null;
+let _gl = null, _program = null, _terulet = null;
+let _egyszer = null;
 
 function glElokeszit(canvas) {
   if (_gl && _gl.canvas === canvas) return true;
-  /* preserveDrawingBuffer: true — a videófelvételhez (captureStream) és
-     a próbaoldalak képkiolvasásához kell, enélkül a vászon tartalma
-     a compositor elvitele után törlődik. */
+  /* Ha MÁR van kontextus egy másik vásznon, és az export-renderhez
+     kell egy új: a régi kontextus megtartása mellett nem lehet
+     ugyanazt a programot/textúrát használni (azok kontextushoz
+     kötöttek). Ezért az export KÜLÖN, saját motort használ. */
   const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false,
                                           preserveDrawingBuffer: true });
   if (!gl) return false;
@@ -219,21 +220,22 @@ function glElokeszit(canvas) {
   return true;
 }
 
-/* ---- a zászló textúrája (a képből) ---- */
+/* ---- a zászló textúrája (a képből) ----
+   FONTOS: a textúrákat KÉPENKÉNT cache-eljük. Ha csak egyetlen
+   textúra-slot lenne, minden zászlóhoz újra fel kellene tölteni a
+   képet (1200×800 RGBA ≈ 3,8 MB) — ez frame-enként 17 zászlónál
+   ~65 MB feltöltést jelentene, ami 30 fps alá vinné a sebességet. */
+const _texturak = new Map();
 function glTextura(img) {
-  if (_keszKep === img && _textura) return;
+  if (_texturak.has(img)) return _texturak.get(img);
   const gl = _gl;
-  if (_textura) gl.deleteTexture(_textura);
-  _textura = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, _textura);
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  /* a magasság igazítása: a WebGL-ben a textúra sorai alulról indulnak,
-     a képek viszont felülről — a shaderben az uv.y-t már megfordítottuk,
-     ezért itt nem kell. */
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
   /* Az anizotróp szűrés (ha van) élesíti a ferde felületeket, és
      megszünteti a finom sávosságot a nagy textúrán. */
@@ -243,7 +245,8 @@ function glTextura(img) {
     const max = gl.getParameter(aniz.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
     gl.texParameterf(gl.TEXTURE_2D, aniz.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(16, max));
   }
-  _keszKep = img;
+  _texturak.set(img, tex);
+  return tex;
 }
 
 /* ---- a lobogó zászló kirajzolása WebGL-lel ----
@@ -277,7 +280,7 @@ function lobogoZaszloGL(canvas, img, x, y, sz, mag, t, beall) {
   gl.uniform2f(_egyszer.terulet, sz, mag);
 
   gl.activeTexture(gl.TEXTURE0);
-  gl.bindTexture(gl.TEXTURE_2D, _textura);
+  gl.bindTexture(gl.TEXTURE_2D, glTextura(img));
   gl.uniform1i(_egyszer.zaszlo, 0);
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);

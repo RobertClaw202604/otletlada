@@ -450,22 +450,28 @@ function rajzolB(t) {
   if (!zaszloE(betu)) return;
   const kep = kepek[betu];
   if (!kep) return;
-  /* a zászló a vászon jó részét kitölti (a méret-csúszka itt is hat) */
-  const mag = Math.min(560, Math.round(zaszloMag * 2.6));
+  /* A zászló a vászon FELSŐ részében, a betű pedig a zászló ALATT,
+     egymást nem takarva. A kettő együtt töltse ki a magasságot. */
+  const mag = Math.min(400, Math.round(zaszloMag * 1.9));
+  const betuM = Math.round(mag * 0.95);          /* a betű ~akkora, mint a zászló */
+  const ossz = mag + betuM * 1.15;               /* zászló + betű + hézag */
+  const felso = Math.round((cB.height - ossz) / 2);
   const szel = Math.round(mag * (FLAG_W / FLAG_H));
+  /* WebGL: a viewport y a vászon ALJÁTÓL számol */
+  const zY = Math.round(felso);
   lobogoZaszloGL(cB, kep, Math.round((cB.width - szel) / 2),
-    Math.round((cB.height - mag) / 2) - 30, szel, mag, t);
-  /* a betű a zászló ALATT, nagyban, a 2D-s rétegre (nem takar) */
+    zY, szel, mag, t);
+  const betuKozep = felso + mag + betuM * 0.62;
   const ctx = cB.getContext("2d");
   if (ctx) {
     ctx.clearRect(0, 0, cB.width, cB.height);
-    ctx.font = "700 150px system-ui, -apple-system, 'Segoe UI', sans-serif";
+    ctx.font = "700 " + betuM + "px system-ui, -apple-system, 'Segoe UI', sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(255,255,255,.92)";
-    ctx.shadowColor = "rgba(0,0,0,.6)";
-    ctx.shadowBlur = 18;
-    ctx.fillText(betu, cB.width / 2, cB.height - 95);
+    ctx.fillStyle = "rgba(255,255,255,.95)";
+    ctx.shadowColor = "rgba(0,0,0,.7)";
+    ctx.shadowBlur = 22;
+    ctx.fillText(betu, cB.width / 2, betuKozep);
     ctx.shadowBlur = 0;
   }
 }

@@ -10,6 +10,7 @@
      id: "arworks",                  // egyedi rövid azonosító
      nev: "ARworks",                 // megjelenő név
      url: "https://arworks.hu",      // opcionális
+     specko: "spec-x.html",          // opcionális: külön specifikáció webes linkje
      statusz: "mukodo",              // mukodo | elinditott | zart | otlet | parkolo | elvetve
      kategoria: "Ügynökség / B2B",   // opcionális címke
      rovid: "Egy soros lényeg.",     // a kártyán látszik
@@ -716,6 +717,7 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
     nev: "Hajózási zászló-ábécé fordító",
     statusz: "otlet",
     kategoria: "Mini web / Szórakozás",
+    specko: "spec-zaszlo-abc.html",
     rovid: "Bármilyen szöveget lefordít hajózási jelzőzászlókra — és lobogó animációval megmutatja.",
     leiras: `Egy **mini weboldal**, amely bármilyen beírt szöveget lefordít a **nemzetközi hajózási jelzőzászló-ábécére** (International Code of Signals — Signal Flags), majd háromféleképpen megjeleníti.
 

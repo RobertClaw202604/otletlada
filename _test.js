@@ -258,6 +258,34 @@ function get(p) {
   r = await ev("document.querySelectorAll('#guide .gsec .gb h3').length");
   ok("a nagy csoportcímek megjelennek (" + r.val + ")", r.val >= 12);
 
+  /* ============ a zászlós ötlet és a speckó-link ============ */
+  r = await ev("PROJEKTEK.filter(p=>p.id==='zaszlo-abc').length");
+  ok("a zászlós ötlet benne van a listában", r.val === 1);
+  r = await ev("PROJEKTEK.find(p=>p.id==='zaszlo-abc').specko");
+  ok("az ötletnek van speckó-hivatkozása (" + r.val + ")", r.val === "spec-zaszlo-abc.html");
+  r = await ev("PROJEKTEK.filter(p=>p.specko).length");
+  ok("egyelőre csak ez az egy projektnek van speckó-linkje", r.val === 1);
+
+  /* a részoldalon megjelenik a speckó-gomb */
+  await ev("openDetail('zaszlo-abc')");
+  r = await ev("!!document.querySelector('#sheet a.url.spec')");
+  ok("a részoldalon megjelenik a 'Teljes specifikáció' gomb", r.val === true);
+  r = await ev("document.querySelector('#sheet a.url.spec').getAttribute('href')");
+  ok("a gomb a helyes fájlra mutat", r.val === "spec-zaszlo-abc.html");
+  r = await ev("document.querySelector('#sheet a.url.spec').getAttribute('target')");
+  ok("a gomb új lapon nyílik", r.val === "_blank");
+  r = await ev("document.querySelector('#sheet a.url.spec').textContent.includes('Teljes specifikáció')");
+  ok("a gomb felirata helyes", r.val === true);
+  r = await ev("document.querySelector('#sheet h2').textContent");
+  ok("a megnyílt részoldal a zászlós ötleté (" + r.val + ")", r.val === "Hajózási zászló-ábécé fordító");
+  await ev("closeDetail()");
+
+  /* egy másik projektnél nincs speckó-gomb */
+  await ev("openDetail('tablog')");
+  r = await ev("!!document.querySelector('#sheet a.url.spec')");
+  ok("más projektnél nincs speckó-gomb", r.val === false);
+  await ev("closeDetail()");
+
   console.log(R.join("\n"));
   const bad = R.filter(x => x.startsWith("✗"));
   console.log("\n" + (R.length - bad.length) + "/" + R.length + " teszt sikeres");

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lobogás-próba — 4. mérföldkő</title>
+<style>
+  :root { --bg:#0b0f14; --card:#141a22; --line:#232c38; --fg:#e9eef5; --mut:#8f9aa8; --acc:#FF5100; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.6 -apple-system,
+    BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+  .wrap { max-width:1000px; margin:0 auto; padding:26px 20px 60px; }
+  h1 { font-size:22px; margin:0 0 6px; }
+  .sub { color:var(--mut); font-size:13.5px; margin-bottom:22px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px; margin-bottom:18px; }
+  .card h2 { font-size:15px; margin:0 0 12px; color:var(--acc); font-weight:650; }
+  canvas { display:block; width:100%; height:auto; border-radius:9px; background:#1a2330; }
+  .ctrl { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:14px; margin-top:16px; }
+  .row { display:flex; flex-direction:column; gap:6px; }
+  .row label { font-size:12.5px; color:var(--mut); display:flex; justify-content:space-between; }
+  .row label b { color:#fff; font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--acc); }
+  .betu { display:flex; gap:7px; flex-wrap:wrap; margin-top:6px; }
+  .betu button { background:#1d2735; color:#cbd6e4; border:1px solid var(--line);
+    border-radius:8px; padding:7px 12px; cursor:pointer; font-size:14px; font-weight:600; }
+  .betu button.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+  .note { font-size:13px; color:var(--mut); margin-top:14px; line-height:1.65; }
+  .note b { color:#e9eef5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>🎏 Lobogás-próba — 4. mérföldkő</h1>
+  <div class="sub">Egyetlen zászló, valósághű mozgással. A csúszkákkal hangolható.
+    Cél: <b>meggyőzőnek tűnik-e?</b></div>
+
+  <div class="card">
+    <h2>Válassz zászlót</h2>
+    <div class="betu" id="valaszto"></div>
+  </div>
+
+  <div class="card">
+    <h2>A zászló lobog</h2>
+    <canvas id="vaszon" width="1400" height="560"></canvas>
+    <div class="ctrl">
+      <div class="row">
+        <label>Amplitúdó <b id="l-amp">7%</b></label>
+        <input type="range" id="s-amp" min="0" max="20" value="7" step="0.5">
+      </div>
+      <div class="row">
+        <label>Hullámhossz <b id="l-hul">1.0×</b></label>
+        <input type="range" id="s-hul" min="30" max="250" value="100">
+      </div>
+      <div class="row">
+        <label>Tempó <b id="l-seb">1.0 /s</b></label>
+        <input type="range" id="s-seb" min="0" max="300" value="100">
+      </div>
+      <div class="row">
+        <label>Oszlopok (finomság) <b id="l-osz">90</b></label>
+        <input type="range" id="s-osz" min="20" max="240" value="90" step="5">
+      </div>
+      <div class="row">
+        <label>Rúd felőli merevség <b id="l-cs">0.85</b></label>
+        <input type="range" id="s-cs" min="20" max="100" value="85">
+      </div>
+      <div class="row">
+        <label>Szél iránya (fázis) <b id="l-faz">0.0</b></label>
+        <input type="range" id="s-faz" min="0" max="628" value="0">
+      </div>
+    </div>
+    <div class="note">
+      <b>Mit érdemes figyelni:</b> a rögzített él (bal oldal, a rúdnál) nem mozdulhat.
+      A szabad él mozog a legnagyobbat. A fény-árnyék a redőknél adja a vászon-érzést.
+    </div>
+  </div>
+
+</div>
+
+<script src="flags.js"></script>
+<script src="lobogas.js"></script>
+<script>
+const vaszon = document.getElementById("vaszon");
+const ctx = vaszon.getContext("2d");
+let kep = null;
+let mostani = "A";
+let t0 = performance.now();
+
+/* a betűválasztó feltöltése */
+const valaszto = document.getElementById("valaszto");
+["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T",
+ "U","V","W","X","Y","Z","1","3","5","8"].forEach(function (b) {
+  const g = document.createElement("button");
+  g.textContent = b;
+  if (b === mostani) g.classList.add("on");
+  g.onclick = function () {
+    mostani = b;
+    document.querySelectorAll(".betu button").forEach(x => x.classList.remove("on"));
+    g.classList.add("on");
+    betolt();
+  };
+  valaszto.appendChild(g);
+});
+
+/* a csúszkák */
+function kot(id, cimke, alakit) {
+  const s = document.getElementById("s-" + id);
+  const l = document.getElementById("l-" + id);
+  const frissit = function () {
+    const ertek = alakit(parseFloat(s.value));
+    l.textContent = ertek.cimke;
+    ertek.beall();
+  };
+  s.addEventListener("input", frissit);
+  frissit();
+}
+
+function betolt() {
+  /* nagy felbontású zászló-kép: így a sávok nem lesznek pixelesek */
+  zaszloBetolt(mostani, 3200).then(function (img) {
+    kep = img;
+  }).catch(function (e) { console.error(e); });
+}
+
+kot("amp", "Amplitúdó", function (v) {
+  return { cimke: v.toFixed(1) + "%", beall: function () { LOB.amplitudo = v / 100; } };
+});
+kot("hul", "Hullámhossz", function (v) {
+  return { cimke: (v / 100).toFixed(2) + "×", beall: function () { LOB.hullamhossz = v / 100; } };
+});
+kot("seb", "Tempó", function (v) {
+  return { cimke: (v / 100).toFixed(2) + " /s", beall: function () { LOB.sebesseg = v / 100; } };
+});
+kot("osz", "Oszlopok", function (v) {
+  return { cimke: String(v), beall: function () { LOB.oszlopok = Math.round(v); } };
+});
+kot("cs", "Merevség", function (v) {
+  return { cimke: (v / 100).toFixed(2), beall: function () { LOB.csillapitas = v / 100; } };
+});
+kot("faz", "Fázis", function (v) {
+  return { cimke: (v / 100).toFixed(1), beall: function () { LOB.fazis = v / 100; } };
+});
+
+/* a fő ciklus */
+function ciklus(most) {
+  const t = (most - t0) / 1000;
+  ctx.clearRect(0, 0, vaszon.width, vaszon.height);
+
+  if (kep) {
+    const mag = 380, szel = mag * (FLAG_W / FLAG_H);
+    const x = 120, y = (vaszon.height - mag) / 2 + 20;
+
+    /* a rúd */
+    ctx.fillStyle = "#4a5566";
+    ctx.fillRect(x - 12, y - 30, 9, mag + 70);
+    ctx.fillStyle = "#8899aa";
+    ctx.beginPath();
+    ctx.arc(x - 8, y - 34, 8, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* a lobogó zászló */
+    lobogoZaszlo(ctx, kep, x, y, szel, mag, t, null);
+
+    /* a betű felirata */
+    ctx.fillStyle = "rgba(255,255,255,.55)";
+    ctx.font = "600 15px -apple-system, sans-serif";
+    ctx.fillText(mostani, x - 4, y + mag + 34);
+  }
+
+  requestAnimationFrame(ciklus);
+}
+
+betolt();
+requestAnimationFrame(ciklus);
+</script>
+</body>
+</html>

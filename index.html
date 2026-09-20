@@ -174,6 +174,13 @@
     transition: .15s;
   }
   .sheet .url.spec:hover { background: rgba(255,81,0,.22); color: #fff; }
+  .sheet .url.proba {
+    display: inline-block; margin: 0 0 14px; padding: 8px 15px;
+    background: rgba(0,180,160,.12); border: 1px solid rgba(0,200,180,.45);
+    border-radius: 9px; color: #4fdcc8; font-weight: 650; text-decoration: none;
+    transition: .15s;
+  }
+  .sheet .url.proba:hover { background: rgba(0,180,160,.24); color: #fff; }
   .sheet .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
   .body-md { font-size: 14.5px; line-height: 1.68; }
   .body-md p { margin: 0 0 12px; }
@@ -537,6 +544,7 @@ function openDetail(id) {
     '<h2>' + d.nev + '</h2>' +
     (d.url ? '<a class="url" href="' + d.url + '" target="_blank" rel="noopener">' + d.url + ' ↗</a>' : "") +
     (d.specko ? '<a class="url spec" href="' + d.specko + '" target="_blank" rel="noopener">📄 Teljes specifikáció megnyitása ↗</a>' : "") +
+    (d.proba ? '<a class="url proba" href="' + d.proba + '" target="_blank" rel="noopener">🎏 Lobogás-próba megnyitása ↗</a>' : "") +
     '<div class="body-md" style="margin-top:12px">' + md(d.leiras) + '</div>' +
 
     /* hátralevő feladatok — FIX nagy blokkok */

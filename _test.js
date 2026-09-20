@@ -280,7 +280,21 @@ function get(p) {
   ok("a megnyílt részoldal a zászlós ötleté (" + r.val + ")", r.val === "Hajózási zászló-ábécé fordító");
   await ev("closeDetail()");
 
-  /* egy másik projektnél nincs speckó-gomb */
+  /* a lobogás-próba gombja */
+  await ev("openDetail('zaszlo-abc')");
+  r = await ev("document.querySelectorAll('#sheet a.url').length");
+  ok("a részoldalon hány link van (" + r.val + ")", r.val === 2);
+  r = await ev("Array.from(document.querySelectorAll('#sheet a.url')).map(a=>a.className).join(',')");
+  ok("a linkek osztályai (" + r.val + ")", r.val === "url spec,url proba");
+  r = await ev("!!document.querySelector('#sheet a.url.proba')");
+  ok("a részoldalon megjelenik a lobogás-próba gomb", r.val === true);
+  r = await ev("document.querySelector('#sheet a.url.proba').getAttribute('href')");
+  ok("a lobogás-próba gomb a helyes fájlra mutat", r.val === "zaszlo-lobogas-proba.html");
+  r = await ev("document.querySelector('#sheet a.url.proba').getAttribute('target')");
+  ok("a lobogás-próba gomb új lapon nyílik", r.val === "_blank");
+  r = await ev("document.querySelector('#sheet a.url.proba').textContent.includes('Lobogás-próba')");
+  ok("a lobogás-próba gomb felirata helyes", r.val === true);
+  await ev("closeDetail()");
   await ev("openDetail('tablog')");
   r = await ev("!!document.querySelector('#sheet a.url.spec')");
   ok("más projektnél nincs speckó-gomb", r.val === false);

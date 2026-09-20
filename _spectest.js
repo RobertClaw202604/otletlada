@@ -8,7 +8,7 @@ const http = require("http");
 const WebSocket = require("ws");
 
 const PORT = 9223;
-const URL = "http://localhost:8903/spec-zaszlo-abc.html";
+const URL = "https://robertclaw202604.github.io/otletlada/spec-zaszlo-abc.html";
 
 function kesleltet(ms) { return new Promise(r => setTimeout(r, ms)); }
 

@@ -53,6 +53,29 @@ szakma.
 
 ---
 
+## 📄 Teljes specifikáció — külön oldal
+
+Ha egy projektnél van kidolgozott specifikáció, a **részoldalán megjelenik egy
+narancs gomb**: „📄 Teljes specifikáció megnyitása". Ez egy **külön oldalt**
+nyit meg, amely a teljes specifikációt mutatja, olvasható formában.
+
+**Jelenleg:**
+- **Hajózási zászló-ábécé fordító** →
+  <https://robertclaw202604.github.io/otletlada/spec-zaszlo-abc.html>
+
+### Hogyan készül egy új specifikáció?
+
+1. Írd meg a szöveget **markdown**-ban: `projekt-nev-spec.md`
+2. Futtasd: `node _gen-spec.js` — legenerálja a beágyazott szöveg-fájlt
+3. Készíts egy `spec-projekt-nev.html`-t (a `spec-zaszlo-abc.html` mintájára)
+4. A `projektek.js`-ben a projektnél vedd fel: `specko: "spec-projekt-nev.html"`
+5. `git push` — és már meg is jelenik a gomb
+
+**A `.md` az egyetlen forrás.** A webes szöveg abból generálódik — így nincs
+két külön igazság, és mindig egyértelmű, hol kell szerkeszteni.
+
+---
+
 ## 🎯 A nagy feladatok — minden projektnél ugyanaz a lista
 
 **Ez NEM választható lista!** Minden projektnél **mind a 14 nagy feladat

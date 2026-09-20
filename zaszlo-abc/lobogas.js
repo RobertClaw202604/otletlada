@@ -25,7 +25,7 @@ const LOB = {
   feny: true,          /* redők árnyékolása */
   fazis: 0,            /* két zászló eltérő fázisa */
   vetules: 0.16,       /* a függőleges vetülés mértéke */
-  suruseg: 1,          /* felbontás-szorzó (1 = minden pixel külön számolva) */
+  lepcso: 2,           /* belső felbontás-csökkentés (1 = teljes, 2 = fél) */
   elsimitas: 1         /* a szélek lágyítása (pixel) */
 };
 
@@ -52,12 +52,32 @@ function hullamEltolas(x01, t, beall) {
   };
 }
 
+/* ---- a forrás-kép pixel-adata, egyszer kiolvasva (gyorsítótár) ----
+/* MIÉRT: korábban minden kockában újra létrehoztuk a rejtett vásznat,
+   újra kirajzoltuk a képet és újra kiolvastuk a 3,2 millió pixelt.
+   Ez önmagában felemésztette a kockaidőt. Most a képhez tartozó
+   adatot EGYSZER olvassuk ki, és a képre hivatkozva tároljuk. */
+const _forrasCache = new WeakMap();
+
+function forrasAdat(img) {
+  let fa = _forrasCache.get(img);
+  if (fa) return fa;
+  const sv = document.createElement("canvas");
+  sv.width = img.width; sv.height = img.height;
+  const sc = sv.getContext("2d", { willReadFrequently: true });
+  sc.drawImage(img, 0, 0);
+  fa = sc.getImageData(0, 0, img.width, img.height).data;
+  _forrasCache.set(img, fa);
+  return fa;
+}
+
 /* ---- a zászló kirajzolása úgy, hogy lobog (folytonos deformáció) ----
    x, y: a zászló bal felső sarka a vásznon
    sz, mag: a zászló mérete pixelben
    t: idő másodpercben */
 function lobogoZaszlo(ctx, img, x, y, sz, mag, t, beall) {
   const b = beall ? Object.assign({}, LOB, beall) : LOB;
+  const lepcso = b.lepcso > 1 ? b.lepcso : 1;   /* belső felbontás-csökkentés */
 
   const cx = Math.max(0, Math.floor(x));
   const cy = Math.max(0, Math.floor(y));
@@ -65,32 +85,27 @@ function lobogoZaszlo(ctx, img, x, y, sz, mag, t, beall) {
   const ch = Math.min(ctx.canvas.height - cy, Math.ceil(mag));
   if (cw <= 0 || ch <= 0) return;
 
-  /* a forrás-képet egyszer olvassuk ki pixel-adatként */
-  const sv = document.createElement("canvas");
-  sv.width = img.width; sv.height = img.height;
-  sv.getContext("2d").drawImage(img, 0, 0);
-  const fa = sv.getContext("2d").getImageData(0, 0, img.width, img.height).data;
+  /* a belső (számolt) terület: lehet kisebb, mint a cél-terület */
+  const bw = Math.ceil(cw / lepcso);
+  const bh = Math.ceil(ch / lepcso);
 
-  const celAdat = ctx.getImageData(cx, cy, cw, ch);
+  const fa = forrasAdat(img);
+  const celAdat = ctx.getImageData(cx, cy, bw, bh);
   const ca = celAdat.data;
 
   const amp = sz * b.amplitudo;
-  const valt = b.suruseg;   /* hány pixelenként számolunk */
 
-  for (let py = 0; py < ch; py += valt) {
-    const y01 = py / (ch - 1 || 1);
-    for (let px = 0; px < cw; px += valt) {
-      const x01 = px / (cw - 1 || 1);
+  for (let py = 0; py < bh; py++) {
+    const y01 = py / (bh - 1 || 1);
+    for (let px = 0; px < bw; px++) {
+      const x01 = px / (bw - 1 || 1);
       const h = hullamEltolas(x01, t, b);
 
       /* a forrás-pozíció: a hullám eltolja a mintavételt */
       const u = x01 - h.dx * b.amplitudo;      /* vízszintes */
       const v = y01 + h.dy * b.vetules;        /* függőleges vetülés */
 
-      if (u < 0 || u > 1 || v < 0 || v > 1) {
-        /* a zászlón kívülre eső rész: nem írunk (átlátszó marad) */
-        continue;
-      }
+      if (u < 0 || u > 1 || v < 0 || v > 1) continue;
 
       /* bilineáris interpoláció a forrás-képen */
       const fx = u * (img.width - 1);
@@ -105,33 +120,20 @@ function lobogoZaszlo(ctx, img, x, y, sz, mag, t, beall) {
       const i01 = (y1 * img.width + x0) * 4;
       const i11 = (y1 * img.width + x1) * 4;
 
-      let r = 0, g = 0, bl = 0, a = 0;
-      /* csak a látható (nem átlátszó) forrás-pixeleket vesszük figyelembe */
-      const suly = [
-        [i00, (1 - tx) * (1 - ty)], [i10, tx * (1 - ty)],
-        [i01, (1 - tx) * ty], [i11, tx * ty]
-      ];
-      for (let q = 0; q < 4; q++) {
-        const ii = suly[q][0], wq = suly[q][1];
-        const al = fa[ii + 3] / 255;
-        r += fa[ii] * wq * al;
-        g += fa[ii + 1] * wq * al;
-        bl += fa[ii + 2] * wq * al;
-        a += al * wq;
-      }
-      if (a <= 0.001) continue;
-      r /= a; g /= a; bl /= a;
+      const w00 = (1 - tx) * (1 - ty), w10 = tx * (1 - ty);
+      const w01 = (1 - tx) * ty, w11 = tx * ty;
+      const a00 = fa[i00 + 3] / 255, a10 = fa[i10 + 3] / 255;
+      const a01 = fa[i01 + 3] / 255, a11 = fa[i11 + 3] / 255;
 
-      /* a zászló szélének lágyítása: a szélső 1-2 pixel átmenetesen
-         tűnik el, így nincs "kivágott" éles kontúr */
-      let alfa = 1;
-      if (b.elsimitas > 0) {
-        const s = b.elsimitas;
-        const perem = Math.min(
-          x01 * sz / s, (1 - x01) * sz / s,
-          y01 * mag / s, (1 - y01) * mag / s);
-        alfa = Math.max(0, Math.min(1, perem));
-      }
+      let a = a00 * w00 + a10 * w10 + a01 * w01 + a11 * w11;
+      if (a <= 0.004) continue;
+
+      let r = (fa[i00] * a00 * w00 + fa[i10] * a10 * w10 +
+               fa[i01] * a01 * w01 + fa[i11] * a11 * w11) / a;
+      let g = (fa[i00 + 1] * a00 * w00 + fa[i10 + 1] * a10 * w10 +
+               fa[i01 + 1] * a01 * w01 + fa[i11 + 1] * a11 * w11) / a;
+      let bl = (fa[i00 + 2] * a00 * w00 + fa[i10 + 2] * a10 * w10 +
+                fa[i01 + 2] * a01 * w01 + fa[i11 + 2] * a11 * w11) / a;
 
       /* árnyék a redőknél: a hullám analitikus meredekségéből.
          Lágy, folytonos átmenet — nincs sávos árnyalás. */
@@ -145,18 +147,33 @@ function lobogoZaszlo(ctx, img, x, y, sz, mag, t, beall) {
         }
       }
 
-      /* a cél-pixel(ek) kitöltése (ha sűrűbben számolunk, blokkot írunk) */
-      for (let dy2 = 0; dy2 < valt && py + dy2 < ch; dy2++) {
-        for (let dx2 = 0; dx2 < valt && px + dx2 < cw; dx2++) {
-          const ti = ((py + dy2) * cw + (px + dx2)) * 4;
-          ca[ti] = r; ca[ti + 1] = g; ca[ti + 2] = bl;
-          ca[ti + 3] = Math.round(alfa * 255);
-        }
+      /* a zászló szélének lágyítása */
+      let alfa = 1;
+      if (b.elsimitas > 0) {
+        const s = b.elsimitas;
+        const perem = Math.min(
+          x01 * sz / s, (1 - x01) * sz / s,
+          y01 * mag / s, (1 - y01) * mag / s);
+        alfa = Math.max(0, Math.min(1, perem));
       }
+
+      const ti = (py * bw + px) * 4;
+      ca[ti] = r; ca[ti + 1] = g; ca[ti + 2] = bl;
+      ca[ti + 3] = Math.round(alfa * 255);
     }
   }
 
-  ctx.putImageData(celAdat, cx, cy);
+  /* visszaírás a cél-vászonra, felskálázva */
+  if (lepcso === 1) {
+    ctx.putImageData(celAdat, cx, cy);
+  } else {
+    const kicsi = document.createElement("canvas");
+    kicsi.width = bw; kicsi.height = bh;
+    kicsi.getContext("2d").putImageData(celAdat, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(kicsi, 0, 0, bw, bh, cx, cy, cw, ch);
+  }
 }
 
 /* ---- a zászló betöltése képként (a canvas-hez) ---- */

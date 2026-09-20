@@ -15,7 +15,16 @@
   .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
     padding:18px; margin-bottom:18px; }
   .card h2 { font-size:15px; margin:0 0 12px; color:var(--acc); font-weight:650; }
-  canvas { display:block; width:100%; height:auto; border-radius:9px; background:#1a2330; }
+  .stage { position:relative; border-radius:9px; overflow:hidden; background:#1a2330; }
+  .stage canvas { display:block; width:100%; height:auto; }
+  .rud { position:absolute; left:calc(120px / 1400 * 100%); top:calc(90px / 560 * 100%);
+    width:calc(9px / 1400 * 100%); height:calc(450px / 560 * 100%);
+    background:#4a5566; border-radius:2px; pointer-events:none; }
+  .gomb { position:absolute; left:calc(112px / 1400 * 100%); top:calc(76px / 560 * 100%);
+    width:calc(16px / 1400 * 100%); height:calc(16px / 560 * 100%);
+    background:#8899aa; border-radius:50%; pointer-events:none; }
+  .felirat { position:absolute; left:calc(116px / 1400 * 100%); top:calc(518px / 560 * 100%);
+    color:rgba(255,255,255,.55); font:600 15px -apple-system,sans-serif; pointer-events:none; }
   .ctrl { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
     gap:14px; margin-top:16px; }
   .row { display:flex; flex-direction:column; gap:6px; }
@@ -28,6 +37,9 @@
   .betu button.on { background:var(--acc); border-color:var(--acc); color:#fff; }
   .note { font-size:13px; color:var(--mut); margin-top:14px; line-height:1.65; }
   .note b { color:#e9eef5; }
+  .fps { position:absolute; top:10px; right:12px; font-size:12px; color:#7fe3c8;
+    background:rgba(0,0,0,.45); padding:4px 9px; border-radius:7px;
+    font-variant-numeric:tabular-nums; }
 </style>
 </head>
 <body>
@@ -44,27 +56,33 @@
 
   <div class="card">
     <h2>A zászló lobog</h2>
-    <canvas id="vaszon" width="1400" height="560"></canvas>
+    <div class="stage">
+      <canvas id="gl" width="1400" height="560"></canvas>
+      <div class="rud"></div>
+      <div class="gomb"></div>
+      <div class="felirat" id="felirat">A</div>
+      <div class="fps" id="fps">—</div>
+    </div>
     <div class="ctrl">
       <div class="row">
-        <label>Amplitúdó <b id="l-amp">7%</b></label>
-        <input type="range" id="s-amp" min="0" max="20" value="7" step="0.5">
+        <label>Amplitúdó <b id="l-amp">12%</b></label>
+        <input type="range" id="s-amp" min="0" max="25" value="12" step="0.5">
       </div>
       <div class="row">
-        <label>Hullámhossz <b id="l-hul">1.0×</b></label>
-        <input type="range" id="s-hul" min="30" max="250" value="100">
+        <label>Hullámhossz <b id="l-hul">1.30×</b></label>
+        <input type="range" id="s-hul" min="30" max="250" value="130">
       </div>
       <div class="row">
-        <label>Tempó <b id="l-seb">1.0 /s</b></label>
-        <input type="range" id="s-seb" min="0" max="300" value="100">
+        <label>Tempó <b id="l-seb">0.70 /s</b></label>
+        <input type="range" id="s-seb" min="0" max="300" value="70">
       </div>
       <div class="row">
-        <label>Oszlopok (finomság) <b id="l-osz">90</b></label>
-        <input type="range" id="s-osz" min="20" max="240" value="90" step="5">
+        <label>Fodrozódás <b id="l-fod">0.30</b></label>
+        <input type="range" id="s-fod" min="0" max="100" value="30">
       </div>
       <div class="row">
-        <label>Rúd felőli merevség <b id="l-cs">0.85</b></label>
-        <input type="range" id="s-cs" min="20" max="100" value="85">
+        <label>Rúd felőli merevség <b id="l-cs">0.90</b></label>
+        <input type="range" id="s-cs" min="20" max="100" value="90">
       </div>
       <div class="row">
         <label>Szél iránya (fázis) <b id="l-faz">0.0</b></label>
@@ -74,19 +92,23 @@
     <div class="note">
       <b>Mit érdemes figyelni:</b> a rögzített él (bal oldal, a rúdnál) nem mozdulhat.
       A szabad él mozog a legnagyobbat. A fény-árnyék a redőknél adja a vászon-érzést.
+      <br>A bal felső sarokban a <b>képkockasebesség</b> látszik — WebGL-lel 60 fps a cél.
     </div>
   </div>
 
 </div>
 
 <script src="flags.js"></script>
-<script src="lobogas.js"></script>
+<script src="lobogas-webgl.js"></script>
 <script>
-const vaszon = document.getElementById("vaszon");
-const ctx = vaszon.getContext("2d");
+const glv = document.getElementById("gl");
+const fpsCimke = document.getElementById("fps");
+const felirat = document.getElementById("felirat");
+
 let kep = null;
 let mostani = "A";
 let t0 = performance.now();
+/* a FLAG_W / FLAG_H a flags.js-ben már létezik — nem deklaráljuk újra */
 
 /* a betűválasztó feltöltése */
 const valaszto = document.getElementById("valaszto");
@@ -99,6 +121,7 @@ const valaszto = document.getElementById("valaszto");
     mostani = b;
     document.querySelectorAll(".betu button").forEach(x => x.classList.remove("on"));
     g.classList.add("on");
+    felirat.textContent = b;
     betolt();
   };
   valaszto.appendChild(g);
@@ -118,9 +141,10 @@ function kot(id, cimke, alakit) {
 }
 
 function betolt() {
-  /* nagy felbontású zászló-kép: így a sávok nem lesznek pixelesek */
+  /* nagy felbontású zászló-kép: így a részletek élesek maradnak */
   zaszloBetolt(mostani, 3200).then(function (img) {
     kep = img;
+    window.__zaszlo = img;
   }).catch(function (e) { console.error(e); });
 }
 
@@ -133,8 +157,8 @@ kot("hul", "Hullámhossz", function (v) {
 kot("seb", "Tempó", function (v) {
   return { cimke: (v / 100).toFixed(2) + " /s", beall: function () { LOB.sebesseg = v / 100; } };
 });
-kot("osz", "Oszlopok", function (v) {
-  return { cimke: String(v), beall: function () { LOB.oszlopok = Math.round(v); } };
+kot("fod", "Fodrozódás", function (v) {
+  return { cimke: (v / 100).toFixed(2), beall: function () { LOB.fodro = v / 100; } };
 });
 kot("cs", "Merevség", function (v) {
   return { cimke: (v / 100).toFixed(2), beall: function () { LOB.csillapitas = v / 100; } };
@@ -144,29 +168,29 @@ kot("faz", "Fázis", function (v) {
 });
 
 /* a fő ciklus */
+let kockak = 0, kockaIdo = performance.now();
 function ciklus(most) {
   const t = (most - t0) / 1000;
-  ctx.clearRect(0, 0, vaszon.width, vaszon.height);
 
+  const mag = 380, szel = mag * (FLAG_W / FLAG_H);
+  const x = 120, y = (glv.height - mag) / 2 + 20;
+
+  /* a lobogó zászló WebGL-lel */
   if (kep) {
-    const mag = 380, szel = mag * (FLAG_W / FLAG_H);
-    const x = 120, y = (vaszon.height - mag) / 2 + 20;
+    const gl2 = glv.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+    if (gl2) {
+      gl2.clearColor(0.10, 0.14, 0.19, 1);   /* a kártya háttere */
+      gl2.clear(gl2.COLOR_BUFFER_BIT);
+      lobogoZaszloGL(glv, kep, x, y, szel, mag, t, null);
+    }
+  }
 
-    /* a rúd */
-    ctx.fillStyle = "#4a5566";
-    ctx.fillRect(x - 12, y - 30, 9, mag + 70);
-    ctx.fillStyle = "#8899aa";
-    ctx.beginPath();
-    ctx.arc(x - 8, y - 34, 8, 0, Math.PI * 2);
-    ctx.fill();
-
-    /* a lobogó zászló */
-    lobogoZaszlo(ctx, kep, x, y, szel, mag, t, null);
-
-    /* a betű felirata */
-    ctx.fillStyle = "rgba(255,255,255,.55)";
-    ctx.font = "600 15px -apple-system, sans-serif";
-    ctx.fillText(mostani, x - 4, y + mag + 34);
+  /* képkockasebesség mérése */
+  kockak++;
+  if (most - kockaIdo > 500) {
+    fpsCimke.textContent = Math.round(kockak * 1000 / (most - kockaIdo)) + " fps";
+    kockak = 0;
+    kockaIdo = most;
   }
 
   requestAnimationFrame(ciklus);

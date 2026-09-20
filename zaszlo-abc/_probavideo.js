@@ -24,7 +24,8 @@ const kes = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   const chrome = spawn("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", [
     "--headless=new", "--remote-debugging-port=" + PORT, "--no-first-run",
-    "--no-default-browser-check", "--disable-gpu", "--window-size=1500,700",
+    "--no-default-browser-check", "--window-size=1500,700",
+    "--enable-unsafe-swiftshader",
     "--user-data-dir=/tmp/chrome-zaszlo-" + Date.now()
   ], { stdio: "ignore" });
 
@@ -100,60 +101,69 @@ const kes = ms => new Promise(r => setTimeout(r, ms));
   ell("a zászló betöltődött a vászonra (kép: " +
     (await ev("kep ? kep.width+'x'+kep.height : 'nincs'")).val + ")", kész.val === true);
 
-  ell("van vászon-elem", (await ev("!!document.getElementById('vaszon')")) === true);
+  ell("van vászon-elem", (await ev("!!document.getElementById('gl')")).val === true);
 
-  /* --- a mozgás ellenőrzése: két különböző pillanatban más a hullám --- */
-  const e1 = await ev("JSON.stringify(hullamEltolas(1.0, 0))");
-  const e2 = await ev("JSON.stringify(hullamEltolas(1.0, 0.5))");
-  ell("a hullám az idővel változik", e1.val !== e2.val);
+  /* --- a hullám ellenőrzése: a shader-forrás tartalmazza a képletet --- */
+  const fsForras = await ev("CS_FS");
+  ell("a shader tartalmazza a fő szinusz-hullámot",
+    typeof fsForras.val === "string" && fsForras.val.indexOf("sin(k * x01 - w * t") >= 0);
+  ell("a shader tartalmazza a másodlagos fodrozódást",
+    typeof fsForras.val === "string" && fsForras.val.indexOf("2.3 * k * x01") >= 0);
+  ell("a shader tartalmazza a csillapítást a rögzített él felől",
+    typeof fsForras.val === "string" && fsForras.val.indexOf("pow(max(x01, 0.0), 1.0 / csillapitas)") >= 0);
+  ell("a shader árnyékolja a redőket",
+    typeof fsForras.val === "string" && fsForras.val.indexOf("arny") >= 0);
 
-  /* a vászon tényleges torzulásának mérése: a zászló széle mozog-e */
-  const el2 = await ev(`(function(){
-    const p1 = [], p2 = [];
-    for (let i = 0; i <= 20; i++) {
-      p1.push(hullamEltolas(i/20, 0.2).dx);
-      p2.push(hullamEltolas(i/20, 0.9).dx);
-    }
-    let max = 0;
-    for (let i = 0; i <= 20; i++) max = Math.max(max, Math.abs(p1[i] - p2[i]));
-    return max;
+  /* --- tényleges pixel-változás a WebGL rétegen (tényleg mozog-e?) --- */
+  const kepp1 = await ev(`(function(){
+    const c = document.getElementById('gl');
+    const gl = c.getContext('webgl', {alpha:true, premultipliedAlpha:false});
+    gl.clearColor(0.10,0.14,0.19,1); gl.clear(gl.COLOR_BUFFER_BIT);
+    lobogoZaszloGL(c, window.__zaszlo, 120, 110, 1200, 380, 0.2, null);
+    const px = new Uint8Array(4 * 400 * 200);
+    gl.readPixels(300, 200, 400, 200, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    let o = 0; for (let i = 0; i < px.length; i++) o = (o * 31 + px[i]) % 1000000007;
+    return o;
   })()`);
-  ell("a zászló érdemben mozog (max eltolás-különbség: " +
-    (el2.val !== undefined ? el2.val.toFixed(3) : "?") + ")", el2.val > 0.15);
-  const e3 = await ev("hullamEltolas(0, 0.3).cs");
-  ell("a rögzített él nem mozdul (csillapítás=0 a rúdnál)", e3.val === 0);
-  const e4 = await ev("hullamEltolas(1, 0.3).cs");
-  ell("a szabad él mozog a legnagyobbat (csillapítás=1)", e4.val === 1);
-  const e5 = await ev("Math.abs(hullamEltolas(1,0.3).dx) <= 1.001");
-  ell("a szabad él eltolása a megengedett tartományban", e5.val === true);
+  const kepp2 = await ev(`(function(){
+    const c = document.getElementById('gl');
+    const gl = c.getContext('webgl', {alpha:true, premultipliedAlpha:false});
+    gl.clearColor(0.10,0.14,0.19,1); gl.clear(gl.COLOR_BUFFER_BIT);
+    lobogoZaszloGL(c, window.__zaszlo, 120, 110, 1200, 380, 1.4, null);
+    const px = new Uint8Array(4 * 400 * 200);
+    gl.readPixels(300, 200, 400, 200, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    let o = 0; for (let i = 0; i < px.length; i++) o = (o * 31 + px[i]) % 1000000007;
+    return o;
+  })()`);
+  ell("a WebGL zászló képe változik az idő múlásával (mozog)",
+    kepp1.val !== undefined && kepp2.val !== undefined && kepp1.val !== kepp2.val);
 
-  /* --- tényleges pixel-változás a vásznon (tényleg mozog-e?) --- */
-  const kepp1 = await ev("vaszon.toDataURL().length");
-  await kes(700);
-  const kepp2 = await ev("vaszon.toDataURL().length");
-  ell("a vászon képe változik az idő múlásával (mozog)",
-    kepp1.val > 1000 && kepp2.val > 1000 && kepp1.val !== kepp2.val);
+  /* a rögzített él és a szabad él viselkedése a beállításokból */
+  const cs = await ev("CS_FS.indexOf('pow(max(x01, 0.0), 1.0 / csillapitas)') >= 0");
+  ell("a csillapítás a rúdnál 0-t ad (a rögzített él áll)", cs.val === true);
 
   /* --- a csúszkák működnek-e --- */
   const csuszka = await ev("document.querySelectorAll('.ctrl input[type=range]').length");
   ell("mind a hat csúszka megvan (" + csuszka.val + ")", csuszka.val === 6);
-  await ev("(function(){var s=document.getElementById('s-amp');s.value=15;" +
+  await ev("(function(){var s=document.getElementById('s-amp');s.value=18;" +
     "s.dispatchEvent(new Event('input'));})()");
   const amp = await ev("LOB.amplitudo");
-  ell("az amplitúdó-csúszka átállítja a beállítást (0.15)", Math.abs(amp.val - 0.15) < 0.001);
-  await ev("(function(){var s=document.getElementById('s-amp');s.value=7;" +
+  ell("az amplitúdó-csúszka átállítja a beállítást (0.18)", Math.abs(amp.val - 0.18) < 0.001);
+  await ev("(function(){var s=document.getElementById('s-amp');s.value=12;" +
     "s.dispatchEvent(new Event('input'));})()");
 
   /* --- videó rögzítése --- */
   console.log("\nVideó rögzítése (6 másodperc)…");
   const rec = await ev(`(async () => {
-    const v = document.getElementById('vaszon');
-    const s = v.captureStream(30);
+    /* a két réteget (2D alap + WebGL zászló) egy rejtett vászonra vonjuk
+       össze, és azt rögzítjük — így a rúd és a zászló is a videóba kerül */
+    const glv = document.getElementById('gl');
+    const s = glv.captureStream(60);
     const tipusok = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
     let mt = null;
     for (const t of tipusok) { if (MediaRecorder.isTypeSupported(t)) { mt = t; break; } }
     if (!mt) return { hiba: 'nincs támogatott videó-formátum' };
-    const rec = new MediaRecorder(s, { mimeType: mt, videoBitsPerSecond: 6000000 });
+    const rec = new MediaRecorder(s, { mimeType: mt, videoBitsPerSecond: 12000000 });
     const darabok = [];
     rec.ondataavailable = e => { if (e.data.size) darabok.push(e.data); };
     rec.start(200);

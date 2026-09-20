@@ -158,11 +158,9 @@ function rajzolTeljesSor(canvas, kepek, betuk, t, beall) {
 }
 
 /* ---- 7. PNG-export ----
-   FONTOS: a WebGL-vászon tartalma a compositor elvitele után TÖRLŐDIK
-   (preserveDrawingBuffer: false, ez a gyorsabb). Ezért a képet NEM a
-   megjelenített vászonról olvassuk vissza a kattintás pillanatában,
-   hanem egy külön, 2D-s vászonra MÁSOLJUK MINDEN KÉPkockA UTÁN.
-   Így az export mindig a legutóbb kirajzolt képet kapja. */
+   A megjelenített WebGL-vászonról a kép visszaolvasása (preserveDrawingBuffer
+   nélkül) üres lenne, ezért az exporthoz KÜLÖN renderelünk egy 2D-s másolatra
+   ugyanazzal a motorral (exportSor). */
 let _mento = null;
 function kepMentes(canvas) {
   if (!_mento) _mento = document.createElement("canvas");
@@ -176,10 +174,38 @@ function kepMentes(canvas) {
   return _mento;
 }
 
-function pngExport(canvas, fajlnev, feherHatter) {
+/* ---- 7b. Export-render: külön vászonra, preserveDrawingBuffer-rel ---- */
+function exportSor(betuk, kepek, szelesseg, magassag, ido, beall) {
+  const cv = document.createElement("canvas");
+  cv.width = szelesseg; cv.height = magassag;
+  const gl = cv.getContext("webgl", { alpha: true, premultipliedAlpha: false,
+                                      preserveDrawingBuffer: true });
+  if (!gl) return null;
+  gl.clearColor(0.10, 0.14, 0.19, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  const t2 = sorTordeles(betuk, szelesseg);
+  let y = 70, x = t2.perem, sorIdx = 0, sorban = 0;
+  betuk.forEach(function (betu, i) {
+    if (sorIdx < t2.sorok.length && sorban >= t2.sorok[sorIdx].length) {
+      sorIdx++; x = t2.perem; y += 170 + 140; sorban = 0;
+    }
+    sorban++;
+    if (!zaszloE(betu)) { x += t2.zaszloSz + t2.hezag; return; }
+    const kep = kepek[betu];
+    if (!kep) { x += t2.zaszloSz + t2.hezag; return; }
+    lobogoZaszloGL(cv, kep, Math.round(x), Math.round(y),
+      t2.zaszloSz, 170, ido,
+      Object.assign({}, beall, { fazis: ((beall && beall.fazis) || 0) + (i % 5) * 0.42 }));
+    x += t2.zaszloSz + t2.hezag;
+  });
+  gl.finish();
+  return kepMentes(cv);
+}
+
+function pngExport(canvas, fajlnev, feherHatter, forrasKep) {
   return new Promise(function (res) {
-    /* előbb a friss kép a mentő-vászonra */
-    const forras = kepMentes(canvas);
+    /* ha kaptunk kész export-rendert, azt használjuk */
+    const forras = forrasKep || kepMentes(canvas);
     let cel = forras;
     if (feherHatter) {
       cel = document.createElement("canvas");

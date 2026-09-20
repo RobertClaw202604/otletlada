@@ -160,9 +160,9 @@ let _egyszer = null, _keszKep = null;
 
 function glElokeszit(canvas) {
   if (_gl && _gl.canvas === canvas) return true;
-  /* preserveDrawingBuffer: true — enélkül a vászon tartalma a
-     compositor elvitele után törlődik, és a PNG-export üres képet ad.
-     A zászlók statikus jelenetek, ezért ez a kis lassulás belefér. */
+  /* preserveDrawingBuffer: true — a videófelvételhez (captureStream) és
+     a próbaoldalak képkiolvasásához kell, enélkül a vászon tartalma
+     a compositor elvitele után törlődik. */
   const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false,
                                           preserveDrawingBuffer: true });
   if (!gl) return false;

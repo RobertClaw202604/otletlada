@@ -360,7 +360,7 @@ function mutatoAllit(i) {
 /* ---------- A) sor rajzolása ---------- */
 let _glA = null;
 function glA() {
-  if (!_glA) _glA = cA.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  if (!_glA) _glA = cA.getContext("webgl", { alpha: true, premultipliedAlpha: false });
   return _glA;
 }
 function rajzolA(t) {
@@ -384,15 +384,12 @@ function rajzolA(t) {
       t2.zaszloSz, 170, t, { fazis: (LOB.fazis || 0) + fazisElt });
     x += t2.zaszloSz + t2.hezag;
   });
-  /* a kész kép mentése az exportához (a WebGL-tartalom a compositor
-     elvitele után törlődik, ezért még azonnal másoljuk) */
-  kepMentes(cA);
 }
 
 /* ---------- B) egy zászló ---------- */
 let _glB = null;
 function glB() {
-  if (!_glB) _glB = cB.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  if (!_glB) _glB = cB.getContext("webgl", { alpha: true, premultipliedAlpha: false });
   return _glB;
 }
 function rajzolB(t) {
@@ -413,7 +410,7 @@ function rajzolB(t) {
 let cAllapot = { feny: false, hatter: "dark", hossz: 5.0, kezdet: 0 };
 let _glC = null;
 function glC() {
-  if (!_glC) _glC = cC.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  if (!_glC) _glC = cC.getContext("webgl", { alpha: true, premultipliedAlpha: false });
   return _glC;
 }
 function rajzolC(t) {
@@ -487,10 +484,12 @@ document.getElementById("torles").onclick = function () {
 
 /* ---------- A) exportok ---------- */
 document.getElementById("pngA").onclick = function () {
-  pngExport(cA, "zaszlosor-" + (bevitel.value.trim() || "szoveg") + ".png", false);
+  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB);
+  pngExport(cA, "zaszlosor-" + (bevitel.value.trim() || "szoveg") + ".png", false, src);
 };
 document.getElementById("pngA2").onclick = function () {
-  pngExport(cA, "zaszlosor-feher-" + (bevitel.value.trim() || "szoveg") + ".png", true);
+  const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB);
+  pngExport(cA, "zaszlosor-feher-" + (bevitel.value.trim() || "szoveg") + ".png", true, src);
 };
 document.getElementById("linkA").onclick = function () {
   const u = szoAzUrlben(bevitel.value);

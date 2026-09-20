@@ -720,6 +720,7 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
     specko: "spec-zaszlo-abc.html",
     proba: "zaszlo-lobogas-proba.html",
     proba2: "zaszlo-lobogas-persp.html",
+    keszLink: "zaszlo-fordito.html",
     rovid: "Bármilyen szöveget lefordít hajózási jelzőzászlókra — és lobogó animációval megmutatja.",
     leiras: `Egy **mini weboldal**, amely bármilyen beírt szöveget lefordít a **nemzetközi hajózási jelzőzászló-ábécére** (International Code of Signals — Signal Flags), majd háromféleképpen megjeleníti.
 

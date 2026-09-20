@@ -51,7 +51,8 @@ uniform float feny;
 uniform float fazis;
 uniform vec2 terulet;      /* a zászló mérete a vásznon (w, h) */
 uniform float arany;       /* a vásznon a zászló helye és mérete */
-uniform float perspektiva; /* 0 = sík zászló, 1 = külső forma is torzul */
+uniform float perspektiva; /* 0 = sík zászló, 1 = külső forma is torzul,
+                              1-nél nagyobb = erősebb mélység-torzítás */
 
 /* a hullám kiszámítása egy x01 pontban */
 vec3 hullam(float x01, float t) {
@@ -83,8 +84,9 @@ vec3 hullamPersp(float x01, float y01, float t) {
   /* a perspektivikus "mélység": a zászló a rúdtól távolodva kisebb
      és keskenyebb lesz, és a hullám ezt erősíti/halványítja */
   float mely = cs * f;
-  /* a vízszintes összehúzódás: a zászló "befelé fordul" a rúd felé */
-  float dx = mely * amplitudo * 1.1;
+  /* a vízszintes összehúzódás: a zászló "befelé fordul" a rúd felé.
+     A mértéket a perspektíva-csúszka adja (0 = sík, 1 = alap). */
+  float dx = mely * amplitudo * 1.1 * max(perspektiva, 0.0);
   float dy = vetules * cs * cos(k * x01 - w * t + fazis);
   /* a magasság rövidülése: amerre a zászló "hátrafelé" hajol.
      Mértékkel — a túl erős zsugorodás bemetszést okoz a széleken. */
@@ -112,7 +114,7 @@ void main() {
   /* a torzítás kiszámítása: sík (hullam) vagy perspektivikus (hullamPersp) */
   vec3 h;
   float u, v;
-  if (perspektiva > 0.5) {
+  if (perspektiva != 0.0) {
     h = hullamPersp(x01, y01, ido);
     u = x01 - h.x / max(amplitudo, 0.0001) * amplitudo;
     v = h.y;
@@ -158,7 +160,11 @@ let _egyszer = null, _keszKep = null;
 
 function glElokeszit(canvas) {
   if (_gl && _gl.canvas === canvas) return true;
-  const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false });
+  /* preserveDrawingBuffer: true — enélkül a vászon tartalma a
+     compositor elvitele után törlődik, és a PNG-export üres képet ad.
+     A zászlók statikus jelenetek, ezért ez a kis lassulás belefér. */
+  const gl = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false,
+                                          preserveDrawingBuffer: true });
   if (!gl) return false;
   _gl = gl;
 
@@ -264,7 +270,10 @@ function lobogoZaszloGL(canvas, img, x, y, sz, mag, t, beall) {
   gl.uniform1f(_egyszer.vetules, b.vetules);
   gl.uniform1f(_egyszer.feny, b.feny ? 1 : 0);
   gl.uniform1f(_egyszer.fazis, b.fazis);
-  gl.uniform1f(_egyszer.perspektiva, b.perspektiva ? 1 : 0);
+  /* a perspektiva lehet logikai (true/false) vagy szám (0..2)
+     — így a csúszka folyamatosan szabályozhatja */
+  gl.uniform1f(_egyszer.perspektiva,
+    b.perspektiva === true ? 1 : (b.perspektiva === false ? 0 : (b.perspektiva || 0)));
   gl.uniform2f(_egyszer.terulet, sz, mag);
 
   gl.activeTexture(gl.TEXTURE0);

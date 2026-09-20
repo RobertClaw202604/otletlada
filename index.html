@@ -181,6 +181,13 @@
     transition: .15s;
   }
   .sheet .url.proba:hover { background: rgba(0,180,160,.24); color: #fff; }
+  .sheet .url.kesz {
+    display: inline-block; margin: 0 0 14px; padding: 9px 17px;
+    background: rgba(0,200,110,.14); border: 1px solid rgba(0,220,120,.5);
+    border-radius: 9px; color: #5ee89b; font-weight: 700; text-decoration: none;
+    transition: .15s;
+  }
+  .sheet .url.kesz:hover { background: rgba(0,200,110,.26); color: #fff; }
   .sheet .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
   .body-md { font-size: 14.5px; line-height: 1.68; }
   .body-md p { margin: 0 0 12px; }
@@ -544,6 +551,7 @@ function openDetail(id) {
     '<h2>' + d.nev + '</h2>' +
     (d.url ? '<a class="url" href="' + d.url + '" target="_blank" rel="noopener">' + d.url + ' ↗</a>' : "") +
     (d.specko ? '<a class="url spec" href="' + d.specko + '" target="_blank" rel="noopener">📄 Teljes specifikáció megnyitása ↗</a>' : "") +
+    (d.keszLink ? '<a class="url kesz" href="' + d.keszLink + '" target="_blank" rel="noopener">🚩 A kész fordító megnyitása ↗</a>' : "") +
     (d.proba ? '<a class="url proba" href="' + d.proba + '" target="_blank" rel="noopener">🎏 Lobogás-próba megnyitása ↗</a>' : "") +
     (d.proba2 ? '<a class="url proba" href="' + d.proba2 + '" target="_blank" rel="noopener">🎏 Lobogás-próba — perspektivikus torzítás ↗</a>' : "") +
     '<div class="body-md" style="margin-top:12px">' + md(d.leiras) + '</div>' +

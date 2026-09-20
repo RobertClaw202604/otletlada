@@ -283,9 +283,15 @@ function get(p) {
   /* a lobogás-próba gombja */
   await ev("openDetail('zaszlo-abc')");
   r = await ev("document.querySelectorAll('#sheet a.url').length");
-  ok("a részoldalon hány link van (" + r.val + ")", r.val === 3);
+  ok("a részoldalon hány link van (" + r.val + ")", r.val === 4);
   r = await ev("Array.from(document.querySelectorAll('#sheet a.url')).map(a=>a.className).join(',')");
-  ok("a linkek osztályai (" + r.val + ")", r.val === "url spec,url proba,url proba");
+  ok("a linkek osztályai (" + r.val + ")", r.val === "url spec,url kesz,url proba,url proba");
+  r = await ev("!!document.querySelector('#sheet a.url.kesz')");
+  ok("a részoldalon megjelenik a kész fordító gombja", r.val === true);
+  r = await ev("document.querySelector('#sheet a.url.kesz').getAttribute('href')");
+  ok("a kész fordító gomb a helyes fájlra mutat", r.val === "zaszlo-fordito.html");
+  r = await ev("document.querySelector('#sheet a.url.kesz').textContent.includes('kész fordító')");
+  ok("a kész fordító gomb felirata helyes", r.val === true);
   r = await ev("!!document.querySelector('#sheet a.url.proba')");
   ok("a részoldalon megjelenik a lobogás-próba gomb", r.val === true);
   r = await ev("document.querySelectorAll('#sheet a.url.proba')[0].getAttribute('href')");

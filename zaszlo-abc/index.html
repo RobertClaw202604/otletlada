@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hajózási zászló-ábécé fordító</title>
+<meta name="description" content="Írj be bármit, és megnézheted nemzetközi hajózási jelzőzászlókon — lobogva.">
+<style>
+  :root {
+    --bg:#0b0f14; --card:#141a22; --line:#232c38; --fg:#e9eef5;
+    --mut:#8f9aa8; --acc:#FF5100; --teal:#00b4a0;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; }
+  body { background:var(--bg); color:var(--fg);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; }
+  .wrap { max-width:1080px; margin:0 auto; padding:26px 18px 60px; }
+
+  header { text-align:center; margin-bottom:22px; }
+  h1 { font-size:24px; margin:0 0 8px; letter-spacing:-.2px; }
+  .sub { color:var(--mut); font-size:13.5px; max-width:640px; margin:0 auto; }
+
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:18px; margin-bottom:16px; }
+  .card h2 { font-size:14px; margin:0 0 12px; color:var(--acc); font-weight:650;
+    text-transform:uppercase; letter-spacing:.4px; }
+
+  /* bemenet */
+  .bemenet { display:flex; gap:10px; }
+  #szo { flex:1; background:#0e141c; border:1px solid var(--line); color:var(--fg);
+    border-radius:10px; padding:13px 14px; font-size:17px; font-weight:650;
+    letter-spacing:1.5px; text-transform:uppercase; min-width:0; }
+  #szo:focus { outline:none; border-color:var(--acc); }
+  #szo::placeholder { color:#54606f; letter-spacing:.5px; font-weight:400;
+    text-transform:none; }
+  .bemenet button { background:#1d2735; color:#cbd6e4; border:1px solid var(--line);
+    border-radius:10px; padding:0 16px; cursor:pointer; font-size:14px; font-weight:600; }
+  .bemenet button:hover { background:#26323f; }
+  .meta { display:flex; justify-content:space-between; align-items:center;
+    margin-top:10px; font-size:12.5px; color:var(--mut); flex-wrap:wrap; gap:8px; }
+  .meta b { color:#fff; font-variant-numeric:tabular-nums; }
+
+  /* fülek */
+  .fulek { display:flex; gap:8px; }
+  .fulek button { flex:1; background:#1d2735; color:#cbd6e4; border:1px solid var(--line);
+    border-radius:10px; padding:11px 8px; cursor:pointer; font-size:14px; font-weight:600; }
+  .fulek button.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+  .fulek button span { display:block; font-size:11px; opacity:.7; font-weight:500; }
+
+  .panel { display:none; }
+  .panel.on { display:block; }
+
+  /* színpad */
+  .stage { position:relative; border-radius:10px; overflow:hidden; background:#1a2330; }
+  .stage canvas { display:block; width:100%; height:auto; }
+  .fps { position:absolute; top:10px; right:12px; font-size:11.5px; color:#7fe3c8;
+    background:rgba(0,0,0,.45); padding:3px 8px; border-radius:6px;
+    font-variant-numeric:tabular-nums; z-index:2; }
+  .feliratNagy { position:absolute; left:50%; transform:translateX(-50%);
+    bottom:12px; font-size:13px; color:rgba(255,255,255,.6); z-index:2;
+    letter-spacing:2px; font-weight:650; }
+
+  /* csúszkák */
+  .ctrl { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px; margin-top:16px; }
+  .row { display:flex; flex-direction:column; gap:5px; }
+  .row label { font-size:12px; color:var(--mut); display:flex; justify-content:space-between; }
+  .row label b { color:#fff; font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%; accent-color:var(--acc); }
+
+  /* gombok */
+  .gombok { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+  .gombok button { background:var(--teal); border:none; color:#04231f; border-radius:10px;
+    padding:11px 18px; cursor:pointer; font-size:14px; font-weight:700; }
+  .gombok button.mas { background:#1d2735; color:#cbd6e4; border:1px solid var(--line); }
+  .gombok button:disabled { opacity:.45; cursor:default; }
+  .gombok button:hover:not(:disabled) { filter:brightness(1.08); }
+
+  /* B mód léptető */
+  .lepteto { display:flex; align-items:center; gap:12px; margin-top:16px; }
+  .lepteto button { background:#1d2735; color:#cbd6e4; border:1px solid var(--line);
+    border-radius:10px; padding:10px 18px; cursor:pointer; font-size:15px; font-weight:700; }
+  .lepteto button:hover { background:#26323f; }
+  .pontok { display:flex; gap:6px; flex-wrap:wrap; flex:1; justify-content:center; }
+  .pont { width:9px; height:9px; border-radius:50%; background:#2c3745; }
+  .pont.on { background:var(--acc); }
+  .pont.kesz { background:#3d6b60; }
+  .modValto { display:flex; gap:8px; margin-top:12px; }
+  .modValto button { background:#1d2735; color:#cbd6e4; border:1px solid var(--line);
+    border-radius:8px; padding:8px 14px; cursor:pointer; font-size:13px; font-weight:600; }
+  .modValto button.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+
+  .note { font-size:12.5px; color:var(--mut); margin-top:14px; line-height:1.65; }
+  .note b { color:#e9eef5; }
+  .hiba { color:#ff8a65; font-size:13px; margin-top:10px; }
+  footer { text-align:center; color:#4d5866; font-size:12px; margin-top:28px; }
+  footer a { color:#6e7d8d; }
+
+  @media (max-width:620px) {
+    h1 { font-size:20px; }
+    .fulek button span { display:none; }
+    .ctrl { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🚩 Hajózási zászló-ábécé fordító</h1>
+    <div class="sub">Írj be bármit — egy nevet, egy céget, egy üzenetet —, és megnézheted
+      <b>nemzetközi hajózási jelzőzászlókon</b>, ahogy a szélben lobognak.
+      Az ékezetek automatikusan egyszerűsödnek.</div>
+  </header>
+
+  <div class="card">
+    <h2>Mit fordítsunk?</h2>
+    <div class="bemenet">
+      <input id="szo" maxlength="40" placeholder="pl. BUDAHÁZY SZABOLCS" value="">
+      <button id="torles" title="Törlés">✕</button>
+    </div>
+    <div class="meta">
+      <span><b id="hossz">0</b> / 40 karakter · <b id="zaszlok">0</b> zászló</span>
+      <span id="linkInfo"></span>
+    </div>
+    <div id="hiba" class="hiba" style="display:none"></div>
+  </div>
+
+  <div class="card">
+    <h2>Hogyan jelenjen meg?</h2>
+    <div class="fulek" id="fulek">
+      <button data-m="A" class="on">Sorban <span>egymás mellett</span></button>
+      <button data-m="B">Egyesével <span>lépegetve</span></button>
+      <button data-m="C">Videó <span>letölthető</span></button>
+    </div>
+  </div>
+
+  <!-- ============ A) SORBAN ============ -->
+  <div class="panel on" id="p-A">
+    <div class="card">
+      <h2>A zászlósor</h2>
+      <div class="stage">
+        <canvas id="cvA" width="1980" height="390"></canvas>
+        <div class="fps" id="fpsA">—</div>
+      </div>
+      <div class="ctrl" id="ctrlA"></div>
+      <div class="gombok">
+        <button id="pngA">PNG letöltése</button>
+        <button id="pngA2" class="mas">PNG (fehér háttér)</button>
+        <button id="linkA" class="mas">Link másolása</button>
+      </div>
+      <div class="note">
+        <b>A lobogás a lényeg:</b> a rögzített él (bal oldal) nem mozdul, a szabad él
+        mozog a legnagyobbat, és a zászló <b>körvonala is hullámzik</b> — nem marad
+        téglalap. A szomszédos zászlók kissé eltérő fázisban lobognak, hogy ne
+        tűnjön mechanikusnak. A csúszkákkal hangolhatod a szelet.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ B) EGYESÉVEL ============ -->
+  <div class="panel" id="p-B">
+    <div class="card">
+      <h2>Betűnként</h2>
+      <div class="stage">
+        <canvas id="cvB" width="1400" height="700"></canvas>
+        <div class="feliratNagy" id="feliratB">A</div>
+      </div>
+      <div class="lepteto">
+        <button id="vissza">◀ Előző</button>
+        <div class="pontok" id="pontok"></div>
+        <button id="elore">Következő ▶</button>
+      </div>
+      <div class="modValto">
+        <button id="autoGomb">▶ Automatikus</button>
+        <button id="sebGomb" class="on">1.5 s</button>
+      </div>
+      <div class="ctrl" id="ctrlB"></div>
+      <div class="note">
+        Ahogy a jelet egyszerre olvassák: <b>egyszerre csak egy zászló</b> látszik.
+        Az automatikus léptetés a megadott tempóban vált.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ C) VIDEÓ ============ -->
+  <div class="panel" id="p-C">
+    <div class="card">
+      <h2>Videó készítése</h2>
+      <div class="ctrl">
+        <div class="row">
+          <label>Felbontás</label>
+          <select id="vFelbontas" style="background:#0e141c;border:1px solid var(--line);
+            color:var(--fg);border-radius:9px;padding:10px;font-size:14px">
+            <option value="1920x1080" selected>1920×1080 (fekvő)</option>
+            <option value="1080x1920">1080×1920 (álló, közösségi)</option>
+            <option value="1280x720">1280×720 (kisebb)</option>
+          </select>
+        </div>
+        <div class="row">
+          <label>Időtartam <b id="l-vido">5.0 s</b></label>
+          <input type="range" id="vIdo" min="30" max="120" value="50">
+        </div>
+        <div class="row">
+          <label>Háttér</label>
+          <select id="vHatter" style="background:#0e141c;border:1px solid var(--line);
+            color:var(--fg);border-radius:9px;padding:10px;font-size:14px">
+            <option value="dark" selected>Sötét (ajánlott)</option>
+            <option value="light">Világos</option>
+          </select>
+        </div>
+      </div>
+      <div class="stage" style="margin-top:16px">
+        <canvas id="cvC" width="1920" height="1080"></canvas>
+      </div>
+      <div class="gombok">
+        <button id="felvetel">● Felvétel indítása</button>
+        <button id="vLetolt" class="mas" disabled>Videó letöltése</button>
+      </div>
+      <div class="note">
+        A videó <b>teljesen a böngésződben</b> készül — semmi nem megy fel a netre.
+        A felvétel a fenti előnézetben fut le; a végén letölthető.
+        <br>A felvétel hossza a szó hosszától függ.
+      </div>
+      <div class="note" id="recAllapot"></div>
+    </div>
+  </div>
+
+  <footer>
+    Készült az <a href="https://arworks.hu" target="_blank" rel="noopener">ARworks</a> műhelyében ·
+    a zászlók a nemzetközi jelzőzászló-rendszer (International Code of Signals) rajzai
+  </footer>
+
+</div>
+
+<script src="flags.js"></script>
+<script src="lobogas-webgl.js"></script>
+<script src="zaszlo-app.js"></script>
+<script>
+/* ============================================================
+   A felület összekötése a motorral
+   ============================================================ */
+
+const cA = document.getElementById("cvA");
+const cB = document.getElementById("cvB");
+const cC = document.getElementById("cvC");
+const bevitel = document.getElementById("szo");
+const hosszKi = document.getElementById("hossz");
+const zaszloKi = document.getElementById("zaszlok");
+const hibaKi = document.getElementById("hiba");
+
+let betuk = [];            /* a lefordított szöveg karakterei */
+let kepek = {};            /* betű -> betöltött kép */
+let mod = "A";
+let t0 = performance.now();
+
+/* ---------- csúszka-építő ---------- */
+function csuszkak(id, elemek) {
+  const tar = document.getElementById(id);
+  tar.innerHTML = "";
+  elemek.forEach(function (e) {
+    const d = document.createElement("div");
+    d.className = "row";
+    d.innerHTML = '<label>' + e.cim + ' <b id="' + id + '-' + e.kulcs + '-v"></b></label>' +
+      '<input type="range" id="' + id + '-' + e.kulcs + '" min="' + e.min +
+      '" max="' + e.max + '" value="' + e.ertek + '" step="' + (e.lep || 1) + '">';
+    tar.appendChild(d);
+    const s = d.querySelector("input");
+    const v = d.querySelector("b");
+    const frissit = function () {
+      const nyers = parseFloat(s.value);
+      v.textContent = e.kepernyo(nyers);
+      e.beall(nyers);
+    };
+    s.addEventListener("input", frissit);
+    frissit();
+  });
+}
+
+const KAT = { cim: "Amplitúdó", kulcs: "amp", min: 0, max: 25, ertek: 12, lep: 0.5,
+  kepernyo: v => v.toFixed(1) + "%", beall: v => { LOB.amplitudo = v / 100; } };
+const KHUL = { cim: "Hullámhossz", kulcs: "hul", min: 30, max: 250, ertek: 130,
+  kepernyo: v => (v / 100).toFixed(2) + "×", beall: v => { LOB.hullamhossz = v / 100; } };
+const KSEB = { cim: "Tempó", kulcs: "seb", min: 0, max: 300, ertek: 70,
+  kepernyo: v => (v / 100).toFixed(2) + " /s", beall: v => { LOB.sebesseg = v / 100; } };
+const KFOD = { cim: "Fodrozódás", kulcs: "fod", min: 0, max: 100, ertek: 30,
+  kepernyo: v => (v / 100).toFixed(2), beall: v => { LOB.fodro = v / 100; } };
+const KPER = { cim: "Mélység-torzítás", kulcs: "per", min: 0, max: 200, ertek: 100,
+  kepernyo: v => (v / 100).toFixed(2), beall: v => { LOB.perspektiva = v / 100; } };
+
+function alapCsuszkak(id) { csuszkak(id, [KAT, KHUL, KSEB, KFOD, KPER]); }
+alapCsuszkak("ctrlA");
+alapCsuszkak("ctrlB");
+
+/* ---------- fordítás + képbetöltés ---------- */
+function frissit() {
+  const nyers = bevitel.value;
+  betuk = fordit(nyers, 40);
+  hosszKi.textContent = betuk.length;
+  zaszloKi.textContent = betuk.filter(zaszloE).length;
+
+  /* a sor mérete: tördelve, ha nem fér ki. A vászon szélessége a
+     LEGHOSSZABB tényleges sorhoz igazodik (nem a maximális darabszámhoz),
+     így rövid szövegnél nem marad felesleges üres sáv. */
+  const maxSzel = 1900;
+  const t = sorTordeles(betuk, maxSzel);
+  const sorokSzam = t.sorok.length;
+  const sorMag = 170 + 70 * 2;
+  let leghosszabb = 0;
+  t.sorok.forEach(function (s) {
+    if (s.length > leghosszabb) leghosszabb = s.length;
+  });
+  cA.width = t.perem * 2 + (leghosszabb * t.zaszloSz + Math.max(0, leghosszabb - 1) * t.hezag);
+  cA.height = sorokSzam * sorMag;
+
+  if (!betuk.filter(zaszloE).length) {
+    hibaKi.style.display = "none";
+  } else {
+    hibaKi.style.display = "none";
+  }
+
+  szoAzUrlben(nyers);
+
+  /* a B) léptető mutatóját az új szöveghez igazítjuk (különben
+     a régi pozíción marad, és a felirat nem frissül) */
+  if (mutato > betuk.length - 1) mutato = Math.max(0, betuk.length - 1);
+  document.getElementById("feliratB").textContent = betuk[mutato] || " ";
+
+  kepekBetolt(betuk, 1200).then(function (tar) {
+    kepek = tar;
+    pontEpit();
+  }).catch(function (e) {
+    hibaKi.style.display = "block";
+    hibaKi.textContent = "Hiba a zászlók betöltésekor: " + e.message;
+  });
+
+  /* a C) előnézet újraméretezése */
+  cC.width = parseInt(document.getElementById("vFelbontas").value.split("x")[0], 10);
+  cC.height = parseInt(document.getElementById("vFelbontas").value.split("x")[1], 10);
+}
+
+/* ---------- B) pontjelző ---------- */
+let mutato = 0;
+function pontEpit() {
+  const tar = document.getElementById("pontok");
+  tar.innerHTML = "";
+  betuk.forEach(function (b, i) {
+    const d = document.createElement("div");
+    d.className = "pont" + (i === mutato ? " on" : (i < mutato ? " kesz" : ""));
+    d.title = b === " " ? "szóköz" : b;
+    tar.appendChild(d);
+  });
+}
+function mutatoAllit(i) {
+  mutato = Math.max(0, Math.min(betuk.length - 1, i));
+  document.getElementById("feliratB").textContent = betuk[mutato] || " ";
+  pontEpit();
+}
+
+/* ---------- A) sor rajzolása ---------- */
+let _glA = null;
+function glA() {
+  if (!_glA) _glA = cA.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  return _glA;
+}
+function rajzolA(t) {
+  const gl = glA();
+  if (!gl) return;
+  gl.clearColor(0.10, 0.14, 0.19, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  const t2 = sorTordeles(betuk, 1900);
+  let y = 70;
+  let x = t2.perem;
+  let sorIdx = 0;
+  let sorban = 0;
+  betuk.forEach(function (betu, i) {
+    if (sorban >= t2.sorok[sorIdx].length) { sorIdx++; x = t2.perem; y += 170 + 140; sorban = 0; }
+    sorban++;
+    if (!zaszloE(betu)) { x += t2.zaszloSz + t2.hezag; return; }
+    const kep = kepek[betu];
+    if (!kep) { x += t2.zaszloSz + t2.hezag; return; }
+    const fazisElt = (i % 5) * 0.42;
+    lobogoZaszloGL(cA, kep, Math.round(x), Math.round(y),
+      t2.zaszloSz, 170, t, { fazis: (LOB.fazis || 0) + fazisElt });
+    x += t2.zaszloSz + t2.hezag;
+  });
+  /* a kész kép mentése az exportához (a WebGL-tartalom a compositor
+     elvitele után törlődik, ezért még azonnal másoljuk) */
+  kepMentes(cA);
+}
+
+/* ---------- B) egy zászló ---------- */
+let _glB = null;
+function glB() {
+  if (!_glB) _glB = cB.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  return _glB;
+}
+function rajzolB(t) {
+  const gl = glB();
+  if (!gl) return;
+  gl.clearColor(0.10, 0.14, 0.19, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  const betu = betuk[mutato];
+  if (!zaszloE(betu)) return;
+  const kep = kepek[betu];
+  if (!kep) return;
+  const mag = 420, szel = Math.round(mag * (FLAG_W / FLAG_H));
+  lobogoZaszloGL(cB, kep, Math.round((cB.width - szel) / 2),
+    Math.round((cB.height - mag) / 2), szel, mag, t);
+}
+
+/* ---------- C) videó-jelenet ---------- */
+let cAllapot = { feny: false, hatter: "dark", hossz: 5.0, kezdet: 0 };
+let _glC = null;
+function glC() {
+  if (!_glC) _glC = cC.getContext("webgl", { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
+  return _glC;
+}
+function rajzolC(t) {
+  const gl = glC();
+  if (!gl) return;
+  const vilagos = cAllapot.hatter === "light";
+  if (vilagos) gl.clearColor(0.96, 0.96, 0.97, 1); else gl.clearColor(0.10, 0.14, 0.19, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+
+  const n = betuk.length || 1;
+  /* a videó: a zászlók egymás után megjelennek, majd a teljes sor látszik */
+  const hossz = cAllapot.hossz;
+  const beuszas = hossz * 0.55 / n;          /* egy zászló beúszása */
+  const eltelt = t - cAllapot.kezdet;
+
+  let latszo = Math.min(n, Math.floor(eltelt / beuszas) + 1);
+  if (eltelt > hossz * 0.72) latszo = n;     /* a végén a teljes sor */
+
+  const latszoBetuk = betuk.slice(0, latszo);
+  const t2 = sorTordeles(latszoBetuk, cC.width - 120, { zaszloMag: 170 });
+  let y = Math.round((cC.height - 170) / 2 - 40);
+  let x = Math.round((cC.width - (t2.darab * t2.zaszloSz + (t2.darab - 1) * t2.hezag)) / 2);
+  latszoBetuk.forEach(function (betu, i) {
+    if (!zaszloE(betu)) { x += t2.zaszloSz + t2.hezag; return; }
+    const kep = kepek[betu];
+    if (!kep) { x += t2.zaszloSz + t2.hezag; return; }
+    const fazisElt = (i % 5) * 0.42;
+    lobogoZaszloGL(cC, kep, Math.round(x), y, t2.zaszloSz, 170, t,
+      { fazis: (LOB.fazis || 0) + fazisElt });
+    x += t2.zaszloSz + t2.hezag;
+  });
+}
+
+/* ---------- fő ciklus ---------- */
+let kockak = 0, kockaIdo = performance.now();
+function ciklus(most) {
+  const t = (most - t0) / 1000;
+  if (!Object.keys(kepek).length) { requestAnimationFrame(ciklus); return; }
+  if (mod === "A") rajzolA(t);
+  else if (mod === "B") rajzolB(t);
+  else if (mod === "C") rajzolC(t);
+
+  kockak++;
+  if (most - kockaIdo > 500) {
+    const f = Math.round(kockak * 1000 / (most - kockaIdo));
+    const c = document.getElementById("fpsA");
+    if (c) c.textContent = f + " fps";
+    kockak = 0; kockaIdo = most;
+  }
+  requestAnimationFrame(ciklus);
+}
+
+/* ---------- fülek ---------- */
+document.querySelectorAll("#fulek button").forEach(function (g) {
+  g.onclick = function () {
+    mod = g.dataset.m;
+    document.querySelectorAll("#fulek button").forEach(x => x.classList.remove("on"));
+    g.classList.add("on");
+    ["A", "B", "C"].forEach(function (m) {
+      document.getElementById("p-" + m).classList.toggle("on", m === mod);
+    });
+    if (mod === "C") { cAllapot.kezdet = 0; }
+  };
+});
+
+/* ---------- bemenet ---------- */
+bevitel.addEventListener("input", frissit);
+document.getElementById("torles").onclick = function () {
+  bevitel.value = ""; mutato = 0; frissit(); bevitel.focus();
+};
+
+/* ---------- A) exportok ---------- */
+document.getElementById("pngA").onclick = function () {
+  pngExport(cA, "zaszlosor-" + (bevitel.value.trim() || "szoveg") + ".png", false);
+};
+document.getElementById("pngA2").onclick = function () {
+  pngExport(cA, "zaszlosor-feher-" + (bevitel.value.trim() || "szoveg") + ".png", true);
+};
+document.getElementById("linkA").onclick = function () {
+  const u = szoAzUrlben(bevitel.value);
+  navigator.clipboard.writeText(u).then(function () {
+    const k = document.getElementById("linkInfo");
+    k.textContent = "✓ link a vágólapon";
+    setTimeout(function () { k.textContent = ""; }, 2200);
+  }).catch(function () {
+    const k = document.getElementById("linkInfo");
+    k.textContent = u;
+  });
+};
+
+/* ---------- B) léptetés ---------- */
+document.getElementById("elore").onclick = function () { mutatoAllit(mutato + 1); };
+document.getElementById("vissza").onclick = function () { mutatoAllit(mutato - 1); };
+document.addEventListener("keydown", function (e) {
+  if (mod !== "B") return;
+  if (e.key === "ArrowRight") mutatoAllit(mutato + 1);
+  if (e.key === "ArrowLeft") mutatoAllit(mutato - 1);
+});
+
+let auto = null;
+const sebessegek = [0.5, 1.0, 1.5, 2.0, 3.0];
+let sebIdx = 2;
+document.getElementById("sebGomb").onclick = function () {
+  sebIdx = (sebIdx + 1) % sebessegek.length;
+  this.textContent = sebessegek[sebIdx].toFixed(1) + " s";
+  if (auto) { clearInterval(auto); autoIndit(); }
+};
+function autoIndit() {
+  auto = setInterval(function () {
+    if (mutato >= betuk.length - 1) { mutatoAllit(0); return; }
+    mutatoAllit(mutato + 1);
+  }, sebessegek[sebIdx] * 1000);
+}
+document.getElementById("autoGomb").onclick = function () {
+  if (auto) {
+    clearInterval(auto); auto = null;
+    this.textContent = "▶ Automatikus"; this.classList.remove("on");
+  } else {
+    autoIndit();
+    this.textContent = "⏸ Megállítás"; this.classList.add("on");
+  }
+};
+
+/* ---------- C) videó ---------- */
+document.getElementById("vIdo").addEventListener("input", function () {
+  document.getElementById("l-vido").textContent = (this.value / 10).toFixed(1) + " s";
+});
+document.getElementById("vFelbontas").onchange = function () {
+  const p = this.value.split("x");
+  cC.width = parseInt(p[0], 10); cC.height = parseInt(p[1], 10);
+};
+document.getElementById("vHatter").onchange = function () {
+  cAllapot.hatter = this.value;
+};
+
+let felvetelObj = null, videoBlob = null;
+document.getElementById("felvetel").onclick = function () {
+  if (felvetelObj) return;
+  const gomb = this;
+  const all = document.getElementById("recAllapot");
+  if (!Object.keys(kepek).length) { all.textContent = "Előbb írj be valamit."; return; }
+
+  cAllapot.hatter = document.getElementById("vHatter").value;
+  cAllapot.hossz = parseFloat(document.getElementById("vIdo").value) / 10;
+  cAllapot.kezdet = (performance.now() - t0) / 1000;
+
+  felvetelObj = videóIndit(cC);
+  if (!felvetelObj) {
+    all.textContent = "Ez a böngésző nem támogatja a videófelvételt.";
+    felvetelObj = null; return;
+  }
+  gomb.disabled = true;
+  gomb.textContent = "● Felvétel…";
+  all.textContent = "Felvétel folyamatban (" + cAllapot.hossz.toFixed(1) + " s) — ne zárd be az oldalt.";
+
+  setTimeout(function () {
+    felvetelObj.megall().then(function (blob) {
+      videoBlob = blob;
+      const letolt = document.getElementById("vLetolt");
+      letolt.disabled = false;
+      letolt.textContent = "Videó letöltése (" + (blob.size / 1024 / 1024).toFixed(1) + " MB)";
+      all.textContent = "✓ Elkészült. Kattints a letöltésre.";
+      gomb.disabled = false;
+      gomb.textContent = "● Felvétel indítása";
+      felvetelObj = null;
+    });
+  }, (cAllapot.hossz + 0.4) * 1000);
+};
+document.getElementById("vLetolt").onclick = function () {
+  if (videoBlob) fajlLetolt(videoBlob, "zaszlo-" + (bevitel.value.trim() || "szoveg") + ".webm");
+};
+
+/* ---------- indítás: a szó az URL-ből ---------- */
+(function () {
+  const q = szoAzUrlben();
+  if (q) bevitel.value = q;
+  if (!bevitel.value) bevitel.value = "BUDAHÁZY SZABOLCS";
+  frissit();
+  mutatoAllit(0);
+  requestAnimationFrame(ciklus);
+})();
+</script>
+</body>
+</html>

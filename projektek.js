@@ -709,5 +709,84 @@ Az érték nem a felület, hanem a **rendszer knowhow-ja**:
       { feladat: "Partnerkapcsolat", kesz: false }
     
     ]
+  },
+
+  {
+    id: "zaszlo-abc",
+    nev: "Hajózási zászló-ábécé fordító",
+    statusz: "otlet",
+    kategoria: "Mini web / Szórakozás",
+    rovid: "Bármilyen szöveget lefordít hajózási jelzőzászlókra — és lobogó animációval megmutatja.",
+    leiras: `Egy **mini weboldal**, amely bármilyen beírt szöveget lefordít a **nemzetközi hajózási jelzőzászló-ábécére** (International Code of Signals — Signal Flags), majd háromféleképpen megjeleníti.
+
+**Hogyan működik:**
+- Beírsz egy szót vagy nevet → a betűk zászlókká alakulnak (A–Z, 0–9).
+- A szóközök és az ismeretlen karakterek helyén üres hely jelenik meg.
+
+**Három megjelenítési mód:**
+
+**A) Egymás mellett, egy sorban** — a zászlók kifeszítve, mint egy zászlósor (*signal hoist*). Így látszik a teljes szó egyben, és ez a legjobb **megosztható kép** (PNG export gomb).
+
+**B) Egymás után, egyesével** — egyszerre csak **egy** zászló látszik, és a következő betűre lép (automatikusan, beállítható sebességgel, vagy gombra). Olyan, mint a jelzőfény — jól mutatja be, hogyan olvassák a zászlójeleket egyszerre egyet.
+
+**C) Videóként** — az egész folyamat felvétele: a zászlók sorban megjelennek, majd **lobognak**. Letölthető videó (WebM/MP4), így posztható közösségi médiára.
+
+**A lényeg — a zászlók lobogása:** a zászlók **animáltan hullámoznak**, ahogy a szélben. Ez adja a varázsát: nem statikus képek, hanem élő, lobogó zászlók. A hullámzás **valósághűen** készül (csillapított rezgés, nem lineáris), és a zászló alakja is követi a redőket.
+
+**Miért jó ez az ARworks-nak:**
+Ez egy **tökéletes megosztható kis eszköz** — könnyen terjed („írd be a nevedet, megnézheted zászlókkal"), és természetesen vezet át a kommunikációba. Az emberek szívesen megosztják az ilyesmit, mert róluk szól. Ez a legjobb belépő: **előbb játszik, aztán kérdez**.
+
+**Technikai vázlat:**
+- Zászló-készlet: SVG-ben (26 betű + 10 számjegy + helyettesítő zászlók).
+- Megjelenítés: HTML Canvas vagy SVG.
+- Lobogás: Canvas-en **hullám-deformáció** (a zászló oszlopai függőlegesen eltolva egy szinusz-görbe mentén, időben eltolva) — ez a klasszikus megoldás.
+- Videó: Canvas-ról MediaRecorder → WebM (böngészőben, **szerver nélkül**!). Így nincs szükség szerverre, minden a böngészőben fut.
+
+**Nyitott kérdések:** Melyik zászlórendszert (nemzetközi jelzőzászlók, vagy magyar folyami jelzések)? Kell-e a három mód mind, vagy elég az egyik? Legyen-e linkgenerátor („zászlós név linkje")?
+
+🔗 **Kapcsolódó:** Ötletláda, DarwinAI — ez is a megosztható, figyelmet hozó kategória.`,
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Melyik zászlókészlet (nemzetközi jelzőzászló / magyar folyami)", kesz: false },
+          { szoveg: "A három megjelenítési mód véglegesítése", kesz: false }
+        ] },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Vezet-e ez át szolgáltatáskérésbe / kapcsolatfelvételbe", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Zászlókészlet SVG-ben (26 betű + 10 számjegy)", kesz: false },
+          { szoveg: "Canvas-renderelő és a lobogás-animáció", kesz: false },
+          { szoveg: "A) sorban egymás mellett + PNG export", kesz: false },
+          { szoveg: "B) egyesével lépegető mód (sebességállítás)", kesz: false },
+          { szoveg: "C) videófelvétel MediaRecorder-rel (WebM)", kesz: false }
+        ] },
+      { feladat: "Publikálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "GitHub Pages-re kitelepítés (szerver nélkül fut)", kesz: false }
+        ] },
+      { feladat: "Láthatóság maximalizálás", kesz: false },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Megosztható példák (híres nevek, cégnevek zászlókkal)", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Rövid cikk: hogyan olvassák a hajósok a jelzőzászlókat", kesz: false }
+        ] },
+      { feladat: "Jogi / adatvédelem", kesz: false },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Hajós / vitorlás klubok, vitorlás iskolák", kesz: false }
+        ] }
+    
+    ]
   }
 ];

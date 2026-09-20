@@ -53,6 +53,12 @@
   /* színpad */
   .stage { position:relative; border-radius:10px; overflow:hidden; background:#1a2330; }
   .stage canvas { display:block; width:100%; height:auto; }
+  /* a B stádium vászna magasabb: a zászló ÉS a nagy betű is kényelmesen elfér */
+  /* a B stádium vászna magasabb: a zászló ÉS a nagy betű is kényelmesen elfér */
+  #cvB { max-height:620px; width:auto; max-width:100%; margin:0 auto; display:block; }
+  /* a betű-réteg PONTOSAN a cvB dobozát fedje (a .stage nem méretadó) */
+  #cvBbetu { position:absolute; left:50%; transform:translateX(-50%);
+    top:0; max-height:620px; width:auto; max-width:100%; pointer-events:none; z-index:3; }
   .fps { position:absolute; top:10px; right:12px; font-size:11.5px; color:#7fe3c8;
     background:rgba(0,0,0,.45); padding:3px 8px; border-radius:6px;
     font-variant-numeric:tabular-nums; z-index:2; }
@@ -170,7 +176,8 @@
     <div class="card">
       <h2>Betűnként</h2>
       <div class="stage">
-        <canvas id="cvB" width="1400" height="700"></canvas>
+        <canvas id="cvB" width="1400" height="820"></canvas>
+        <canvas id="cvBbetu" class="betuReteg"></canvas>
       </div>
       <div class="lepteto">
         <button id="vissza">◀ Előző</button>
@@ -182,6 +189,9 @@
         <button id="sebGomb" class="on">1.5 s</button>
       </div>
       <div class="ctrl" id="ctrlB"></div>
+      <div class="gombok">
+        <button id="betuGombB" class="mas">🔤 Betűk mutatása</button>
+      </div>
       <div class="note">
         Ahogy a jelet egyszerre olvassák: <b>egyszerre csak egy zászló</b> látszik.
         Az automatikus léptetés a megadott tempóban vált.
@@ -250,6 +260,7 @@
 const cA = document.getElementById("cvA");
 const cAbetu = document.getElementById("cvAbetu");
 const cB = document.getElementById("cvB");
+const cBbetu = document.getElementById("cvBbetu");
 const cC = document.getElementById("cvC");
 const bevitel = document.getElementById("szo");
 const hosszKi = document.getElementById("hossz");
@@ -262,6 +273,7 @@ let mod = "A";
 let t0 = performance.now();
 let zaszloMag = 170;       /* az A) mód zászlómagassága (méret-csúszka) */
 let betuLatszik = false;   /* mutassuk-e a betűket a zászlók alatt */
+let betuLatszikB = true;   /* a B) módban külön kapcsoló (alapból BE) */
 
 /* ---------- csúszka-építő ---------- */
 function csuszkak(id, elemek) {
@@ -452,26 +464,35 @@ function rajzolB(t) {
   if (!kep) return;
   /* A zászló a vászon FELSŐ részében, a betű pedig a zászló ALATT,
      egymást nem takarva. A kettő együtt töltse ki a magasságot. */
-  const mag = Math.min(400, Math.round(zaszloMag * 1.9));
+  const mag = Math.min(420, Math.round(zaszloMag * 2.0));
   const betuM = Math.round(mag * 0.95);          /* a betű ~akkora, mint a zászló */
-  const ossz = mag + betuM * 1.15;               /* zászló + betű + hézag */
-  const felso = Math.round((cB.height - ossz) / 2);
+  const ossz = mag + betuM * 1.25;               /* zászló + betű + hézag */
+  const felso = Math.max(24, Math.round((cB.height - ossz) / 2));
   const szel = Math.round(mag * (FLAG_W / FLAG_H));
   /* WebGL: a viewport y a vászon ALJÁTÓL számol */
   const zY = Math.round(felso);
   lobogoZaszloGL(cB, kep, Math.round((cB.width - szel) / 2),
     zY, szel, mag, t);
-  const betuKozep = felso + mag + betuM * 0.62;
-  const ctx = cB.getContext("2d");
+  const betuKozep = felso + mag + betuM * 0.72;
+  /* A betűt KÜLÖN 2D-s rétegre tesszük: a cB-nek már WebGL-kontextusa
+     van, ezért a cB.getContext("2d") NULL lenne (egy vászonnak csak
+     egy kontextusa lehet). */
+  if (!cBbetu) return;
+  if (cBbetu.width !== cB.width || cBbetu.height !== cB.height) {
+    cBbetu.width = cB.width;
+    cBbetu.height = cB.height;
+  }
+  const ctx = cBbetu.getContext("2d");
   if (ctx) {
-    ctx.clearRect(0, 0, cB.width, cB.height);
+    ctx.clearRect(0, 0, cBbetu.width, cBbetu.height);
+    if (!betuLatszikB) return;
     ctx.font = "700 " + betuM + "px system-ui, -apple-system, 'Segoe UI', sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillStyle = "rgba(255,255,255,.95)";
-    ctx.shadowColor = "rgba(0,0,0,.7)";
-    ctx.shadowBlur = 22;
-    ctx.fillText(betu, cB.width / 2, betuKozep);
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(0,0,0,.85)";
+    ctx.shadowBlur = 26;
+    ctx.fillText(betu, cBbetu.width / 2, betuKozep);
     ctx.shadowBlur = 0;
   }
 }
@@ -558,6 +579,19 @@ document.getElementById("betuGomb").onclick = function () {
   this.classList.toggle("on", betuLatszik);
   this.textContent = betuLatszik ? "🔤 Betűk elrejtése" : "🔤 Betűk mutatása";
 };
+/* ---------- B) exportok / kapcsolók ---------- */
+const bb = document.getElementById("betuGombB");
+if (bb) {
+  const bkEz = function () {
+    bb.classList.toggle("on", betuLatszikB);
+    bb.textContent = betuLatszikB ? "🔤 Betűk elrejtése" : "🔤 Betűk mutatása";
+  };
+  bkEz();
+  bb.onclick = function () {
+    betuLatszikB = !betuLatszikB;
+    bkEz();
+  };
+}
 document.getElementById("pngA").onclick = function () {
   const src = exportSor(betuk, kepek, cA.width, cA.height, (performance.now() - t0) / 1000, LOB, null, zaszloMag);
   pngExport(cA, "zaszlosor-" + (bevitel.value.trim() || "szoveg") + ".png", false, src);

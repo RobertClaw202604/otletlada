@@ -22,7 +22,8 @@ const LOB = {
   fodro: 0.3,
   feny: true,
   fazis: 0,
-  vetules: 0.16
+  vetules: 0.16,
+  perspektiva: true
 };
 
 /* a csúcs-shader: egyetlen, a teljes vásznat lefedő négyszög */
@@ -50,6 +51,7 @@ uniform float feny;
 uniform float fazis;
 uniform vec2 terulet;      /* a zászló mérete a vásznon (w, h) */
 uniform float arany;       /* a vásznon a zászló helye és mérete */
+uniform float perspektiva; /* 0 = sík zászló, 1 = külső forma is torzul */
 
 /* a hullám kiszámítása egy x01 pontban */
 vec3 hullam(float x01, float t) {
@@ -68,6 +70,34 @@ vec3 hullam(float x01, float t) {
   return vec3(dx, dy, meredek);
 }
 
+/* ugyanaz, de a külső-befoglaló torzításhoz egyszerűbb hullám (kevesebb fodro) */
+vec3 hullamPersp(float x01, float y01, float t) {
+  float w = 6.28318530718 * sebesseg;
+  float k = 6.28318530718 / hullamhossz;
+  float cs = pow(max(x01, 0.0), 1.0 / csillapitas);
+  float f1 = sin(k * x01 - w * t + fazis);
+  float f2 = sin(2.3 * k * x01 - 2.1 * w * t + fazis * 1.7);
+  float f = f1 + fodro * f2;
+  float meredek = cs * (k * cos(k * x01 - w * t + fazis)
+                        + fodro * 2.3 * k * cos(2.3 * k * x01 - 2.1 * w * t + fazis * 1.7));
+  /* a perspektivikus "mélység": a zászló a rúdtól távolodva kisebb
+     és keskenyebb lesz, és a hullám ezt erősíti/halványítja */
+  float mely = cs * f;
+  /* a vízszintes összehúzódás: a zászló "befelé fordul" a rúd felé */
+  float dx = mely * amplitudo * 1.1;
+  float dy = vetules * cs * cos(k * x01 - w * t + fazis);
+  /* a magasság rövidülése: amerre a zászló "hátrafelé" hajol.
+     Mértékkel — a túl erős zsugorodás bemetszést okoz a széleken. */
+  float zsugor = 1.0 - abs(dx) * 1.15;
+  zsugor = clamp(zsugor, 0.62, 1.25);
+  /* a zászló közepe felé húzódik, és a közép is vándorol a széllel */
+  float kozep = 0.5 + dy * 0.35;
+  float v2 = kozep + (y01 - kozep) * zsugor;
+  /* a függőleges hullámzás is ráül */
+  v2 += dy * 0.55;
+  return vec3(dx, v2, meredek);
+}
+
 void main() {
   /* a canvas UV (0..1) -> a zászló területére képezzük le */
   float x01 = uv.x;
@@ -79,11 +109,18 @@ void main() {
     return;
   }
 
-  vec3 h = hullam(x01, ido);
-
-  /* a mintavétel helye: a hullám eltolja */
-  float u = x01 - h.x * amplitudo;
-  float v = y01 + h.y * vetules;
+  /* a torzítás kiszámítása: sík (hullam) vagy perspektivikus (hullamPersp) */
+  vec3 h;
+  float u, v;
+  if (perspektiva > 0.5) {
+    h = hullamPersp(x01, y01, ido);
+    u = x01 - h.x / max(amplitudo, 0.0001) * amplitudo;
+    v = h.y;
+  } else {
+    h = hullam(x01, ido);
+    u = x01 - h.x * amplitudo;
+    v = y01 + h.y * vetules;
+  }
 
   if (u < 0.0 || u > 1.0 || v < 0.0 || v > 1.0) {
     gl_FragColor = vec4(0.0);
@@ -169,6 +206,7 @@ function glElokeszit(canvas) {
     vetules: gl.getUniformLocation(program, "vetules"),
     feny: gl.getUniformLocation(program, "feny"),
     fazis: gl.getUniformLocation(program, "fazis"),
+    perspektiva: gl.getUniformLocation(program, "perspektiva"),
     terulet: gl.getUniformLocation(program, "terulet"),
     zaszlo: gl.getUniformLocation(program, "zaszlo")
   };
@@ -226,6 +264,7 @@ function lobogoZaszloGL(canvas, img, x, y, sz, mag, t, beall) {
   gl.uniform1f(_egyszer.vetules, b.vetules);
   gl.uniform1f(_egyszer.feny, b.feny ? 1 : 0);
   gl.uniform1f(_egyszer.fazis, b.fazis);
+  gl.uniform1f(_egyszer.perspektiva, b.perspektiva ? 1 : 0);
   gl.uniform2f(_egyszer.terulet, sz, mag);
 
   gl.activeTexture(gl.TEXTURE0);

@@ -793,5 +793,113 @@ Ez egy **tökéletes megosztható kis eszköz** — könnyen terjed („írd be 
         ] }
     
     ]
+  },
+
+  {
+    id: "ivfsimpro",
+    nev: "IVF Sim Pro",
+    url: "https://ivfsimpro.com",
+    statusz: "mukodo",
+    kategoria: "Medtech / VR oktatás",
+    rovid: "A világ első VR és webböngészős ICSI/embrió-biopszia szimulátora — orvosi szakképzésre.",
+    leiras: `Az **IVF Sim Pro (ivfsimpro.com)** egy mesterséges megtermékenyítési (IVF) oktató-szimulátor szoftver: VR és webböngészős változatban tanítja az **ICSI** (intracitoplazmatikus spermium-injekció) és az **embrió-biopszia** lépéseit. A világ első ilyen VR megoldása ezen a területen.
+
+**Mit tud:**
+- **Teljes folyamat szimuláció** élethű virtuális laborban, valós méretű mikroszkóppal — a kezelőgombok egy valódi IVF-mikroszkóp funkcióit utánozzák.
+- **Valós idejű visszajelzés**: hibák, tűbeállítások mindig láthatók, a lépések és a következő művelet a képernyőn követhető.
+- **Végtelen gyakorlás** ritka és deformált mintákkal is, drága laboreszközök, petesejt/spermium-készlet és oktató nélkül.
+- **Vizsgáztatás**: eljárási tudás, sebesség és pontosság mérése, tudásfrissítés.
+
+**Hogyan érhető el:**
+- **VR app** Oculus Quest I/II-n (teljesen immerzív, valós méretű labor).
+- **Web app** laptoppal/PC-vel (Safari, Chrome, Edge; a tűket billentyűzettel kezelni).
+
+**Célcsoport:** orvosi egyetemek, IVF-klinikák, szakképző intézmények, gyakorló szakemberek.
+- **Egyéni szakembereknek:** előfizetés **40 USD/hó**, saját eszközön.
+- **Szervezeteknek:** havi/éves előfizetés csomagban, **telepítéssel, képzéssel és support vonallal**.
+
+**Ami már kész:** a **VR app**, a **webapp** és a **weboldal** is él. Az **ARworks** fejlesztette (VR/AR/3D fejlesztő, más orvosi immerzív megoldásokra is nyitott); a szakmai kérdéseket a The IVF Company válaszolja meg.
+
+**Ami hiányzik / a következő lépés:** **sales és kommunikáció.** Ehhez **van Mailchimp kontaktlistánk** — meg kell szólítani a klinikákat, egyetemeket és szakképzőket.
+
+**Lehetőségek:**
+- Meglévő Mailchimp lista szegmentálása és célzott eDM-sorozat (klinikák, egyetemek, oktatóközpontok).
+- Bemutatóvideó / demó elérhetővé tétele a döntéshozóknak.
+- Intézményi csomag (telepítés + képzés + support) hangsúlyozása a magasabb értékű szerződésekhez.
+- Konferenciák, IVF/ART szakmai rendezvények, egyetemi kapcsolatok.
+- Több nyelvű üzenet (a termék már eleve nemzetközi).
+
+**Nyitott kérdések:** Melyik Mailchimp lista pontosan (audience ID)? Ki a döntéshozó az intézményeknél (laborvezető, szakképzési felelős, beszerzés)? Van-e kész bemutatóvideó, esettanulmány vagy ügyfél-referencia? Mi az első kampány célja (demó / előfizetés / intézményi ajánlat)?
+
+🔗 **Kapcsolódó:** ARworks, CogniView (VR mérés), a darwinai.hu kommunikációs modell.`,
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: true,
+        reszfeladatok: [
+          { szoveg: "Termék és funkciók (VR + web app, ICSI + embrió-biopszia)", kesz: true },
+          { szoveg: "Weboldal és csomagok (egyéni / intézményi)", kesz: true }
+        ] },
+      { feladat: "Üzleti modell", kesz: true,
+        reszfeladatok: [
+          { szoveg: "Előfizetés: 40 USD/hó egyéni, intézményi csomag telepítéssel", kesz: true },
+          { szoveg: "Magasabb értékű intézményi szerződések kidolgozása", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: true,
+        reszfeladatok: [
+          { szoveg: "VR app Oculus Quest I/II-re", kesz: true },
+          { szoveg: "Web app böngészőben (Safari, Chrome, Edge)", kesz: true },
+          { szoveg: "Weboldal (ivfsimpro.com)", kesz: true }
+        ] },
+      { feladat: "Publikálás", kesz: true },
+      { feladat: "Láthatóság maximalizálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Bemutatóvideó / demó a döntéshozóknak", kesz: false },
+          { szoveg: "Esettanulmány / ügyfél-referencia összeállítása", kesz: false }
+        ] },
+      { feladat: "Sales", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Mailchimp kontaktlista szegmentálása (klinikák, egyetemek, szakképzők)", kesz: false },
+          { szoveg: "Döntéshozók azonosítása (laborvezető, szakképzési felelős, beszerzés)", kesz: false },
+          { szoveg: "Intézményi ajánlat / pilot program kidolgozása", kesz: false },
+          { szoveg: "Outreach-sorozat a meglévő listára", kesz: false }
+        ] },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Pozicionálás: „a világ első VR ICSI-szimulátora”", kesz: false },
+          { szoveg: "Szakmai üzenetek (idő- és költségmegtakarítás, végtelen gyakorlás)", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Kulcsszavak: ICSI training simulator, IVF VR training, embryo biopsy simulation", kesz: false }
+        ] },
+      { feladat: "eDM / hírlevél", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Célzott eDM-sorozat a meglévő Mailchimp listára", kesz: false },
+          { szoveg: "Intézményi döntéshozóknak szóló, rövidebb demó-ajánló levél", kesz: false }
+        ] },
+      { feladat: "Hirdetés (Ads)", kesz: false,
+        reszfeladatok: [
+          { szoveg: "LinkedIn célzás: IVF-klinika / egyetemi / medtech döntéshozók", kesz: false }
+        ] },
+      { feladat: "Tartalom / blog", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Szakmai cikk: hogyan gyorsítja a VR a szakképzést", kesz: false }
+        ] },
+      { feladat: "Jogi / adatvédelem", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Oktatási célú adatkezelés és megfelelés (medtech környezet)", kesz: false }
+        ] },
+      { feladat: "Árazás", kesz: true,
+        reszfeladatok: [
+          { szoveg: "Egyéni: 40 USD/hó", kesz: true },
+          { szoveg: "Intézményi: csomagár telepítéssel és támogatással", kesz: false }
+        ] },
+      { feladat: "Partnerkapcsolat", kesz: false,
+        reszfeladatok: [
+          { szoveg: "The IVF Company (szakmai partner) kapcsolat erősítése", kesz: false },
+          { szoveg: "IVF/ART szakmai konferenciák és egyetemi kapcsolatok", kesz: false },
+          { szoveg: "Dubai IVF Training Centre (pre-session helyszín)", kesz: false }
+        ] }
+    
+    ]
   }
 ];

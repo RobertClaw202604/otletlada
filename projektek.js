@@ -901,5 +901,98 @@ Ez egy **tökéletes megosztható kis eszköz** — könnyen terjed („írd be 
         ] }
     
     ]
+  },
+
+  {
+    id: "ai-tudosok-halo",
+    nev: "AI Tudósok Kapcsolati Térképe",
+    url: "https://robertclaw202604.github.io/ai-tudosok-halo/",
+    statusz: "otlet",
+    kategoria: "Adatvizualizáció / Kutatás",
+    rovid: "86 AI-kutató interaktív kapcsolati hálója — ki kivel dolgozott együtt, hol és meddig.",
+    leiras: `Az **AI Tudósok Kapcsolati Térképe** egy interaktív adatvizualizáció, amely **86 vezető AI-kutató és mérnök** szakmai kapcsolathálóját mutatja be. A cél: láthatóvá tenni, hogyan áramlik a tudás és a tehetség a nagy AI-laborok között — kik dolgoztak együtt, hol és mennyi ideig.
+
+## Mi ez pontosan
+
+Egyetlen önálló HTML fájl, külső függőség nélkül (offline is fut). A megjelenítés **körgráf**:
+
+- **Egy kör = egy ember.** A kör mérete a karrier teljes hosszával arányos.
+- **A körgyűrű szegmensei = hol dolgozott** (szín = cég, a szegmens szélessége = az ott töltött idő aránya).
+- **Az élek = közös munkahely átfedő évekkel** (vastagság = hány évig voltak együtt).
+- **Kapcsolat-erősség csúszka** — alapból min. 6 év együtt (a 902 nyers kapcsolatból ~347 marad, így olvasható).
+- **Kattintás egy körre** → név, születési év, jelenlegi pozíció, teljes karriertábla (cég / szerep / mettől–meddig) és a közös munkahelyek chip-ekben. A kapcsolatok narancssárgán világítanak, a többi elhalványul.
+- **Színkód szűrő** (legenda) — teljes cégrétegek kapcsolhatók ki.
+- Zoom (görgő), pan (húzás), node-húzás, dupla kattintás = visszaállítás.
+
+## Adatbázis és felépítés
+
+- **86 fő** adatbázisa: név, születési év, nemzetiség, jelenlegi pozíció, karrier-szakaszok (szervezet / szerep / mettől–meddig).
+- **Forrás:** nyilvánosan elérhető életrajzok, publikációk, LinkedIn-adatok kézi gyűjtése.
+- **Generálás:** Node.js script (build-network.mjs) építi az adatból az önálló HTML-t.
+- **Színpaletta szervezet szerint:** Anthropic, OpenAI, Google/DeepMind, Meta/FAIR, xAI, Mistral/Nous, Cohere, NVIDIA, Academia, kínai labok, egyéb startup. Narancs körvonal = jelenleg is aktív pozíció.
+
+## Főbb hálózati mintázatok
+
+- **OpenAI → Anthropic exodus (2021):** Dario & Daniela Amodei, Tom Brown, Jared Kaplan, Sam McCandlish, Jack Clark, Chris Olah, Ben Mann, Sam Bowman, Nicholas Joseph.
+- **Transformer szerzők (2017, Google):** Vaswani, Parmar, Shazeer, Uszkoreit, Polosukhin, Kaiser, Gomez.
+- **OpenAI → xAI (2023):** Babuschkin, Tony Wu, Jimmy Ba, Christian Szegedy, Guodong Zhang.
+- **OpenAI → Thinking Machines Lab (2025):** Murati, Zoph, Weng, Sidor, Chintala.
+- **DeepMind → Mistral (2023):** Mensch; **FAIR → Mistral:** Lample, Lacroix.
+- **Hinton-tanítványok:** Sutskever, Krizhevsky, Ba (Adam).
+- **Fei-Fei Li-tanítványok:** Karpathy (PhD).
+
+## Mire jó / mire lehet használni
+
+- **Oktatás és szemléltetés:** hogyan épül fel egy kutatási terület emberi hálózata.
+- **Tehetség-áramlás elemzése:** melyik lab a „kisugárzó központ”, honnan hova vándorolnak a kutatók.
+- **Kapcsolódó nézetek:** ugyanebből az adatból készült egy **karriertimeline** (ki mikor hol dolgozott) és egy **csillagtérkép** (canvas-alapú, bezoomolható „égbolt”, ahol a csillagok az emberek).
+
+🔗 **Kapcsolódó:** ARworks adatvizualizációs irány, DarwinAI (AI-oktatás), darwinai.hu kommunikációs modell.`,
+    hatralevo: [
+      { feladat: "Teljes speckó", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Adatbázis: 86 fő karrier-szakaszai (org / role / from / to)", kesz: true },
+          { szoveg: "Kapcsolat-számítás: közös munkahely átfedő évekkel", kesz: true },
+          { szoveg: "Interaktív körgráf nézet (keresés, szűrők, zoom/pan)", kesz: true },
+          { szoveg: "Alternatív nézetek: karriertimeline és csillagtérkép", kesz: true }
+        ] },
+      { feladat: "Üzleti modell", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Önálló termék vagy DarwinAI-ra vezető tartalom-marketing eszköz?", kesz: false },
+          { szoveg: "Bővített adatbázis (200+ fő) értékesítési lehetősége", kesz: false }
+        ] },
+      { feladat: "Kész szoftver", kesz: true,
+        reszfeladatok: [
+          { szoveg: "Önálló vizualizációs HTML (külső függőség nélkül)", kesz: true },
+          { szoveg: "GitHub Pages publikálás", kesz: true }
+        ] },
+      { feladat: "Publikálás", kesz: true },
+      { feladat: "Láthatóság maximalizálás", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Megosztható formátum (kép / rövid videó a hálóról)", kesz: false },
+          { szoveg: "LinkedIn poszt / cikk az AI-tehetségáramlásról", kesz: false }
+        ] },
+      { feladat: "Sales", kesz: false },
+      { feladat: "Marketing", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Pozicionálás: „így áramlik a tudás az AI-laborok között”", kesz: false }
+        ] },
+      { feladat: "SEO", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Kulcsszavak: AI researcher network, AI talent flow visualization", kesz: false }
+        ] },
+      { feladat: "eDM / hírlevél", kesz: false },
+      { feladat: "Hirdetés (Ads)", kesz: false },
+      { feladat: "Tartalom / blog", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Cikk: az OpenAI → Anthropic exodus hálózati képe", kesz: false }
+        ] },
+      { feladat: "Jogi / adatvédelem", kesz: false,
+        reszfeladatok: [
+          { szoveg: "Nyilvános adatok (életrajz, publikáció) felhasználásának ellenőrzése", kesz: false }
+        ] },
+      { feladat: "Árazás", kesz: false },
+      { feladat: "Partnerkapcsolat", kesz: false }
+    ]
   }
 ];

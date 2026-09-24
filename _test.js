@@ -23,7 +23,7 @@ function get(p) {
   await new Promise(r => setTimeout(r, 2800));
 
   let t;
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 21; i++) {
     try { t = JSON.parse(await get("/json/list")); break; }
     catch (e) { await new Promise(r => setTimeout(r, 500)); }
   }
@@ -58,16 +58,16 @@ function get(p) {
   /* --- betöltés --- */
   ok("az adatfájl betöltött", (await ev("typeof PROJEKTEK !== 'undefined'")).val === true);
   r = await ev("PROJEKTEK.length");
-  ok("20 projekt van betöltve (" + r.val + ")", r.val === 20);
+  ok("21 projekt van betöltve (" + r.val + ")", r.val === 21);
   r = await ev("[...new Set(PROJEKTEK.map(p=>p.id))].length");
-  ok("minden projekt-azonosító egyedi (" + r.val + ")", r.val === 20);
+  ok("minden projekt-azonosító egyedi (" + r.val + ")", r.val === 21);
   r = await ev("NAGY_FELADATOK.length");
   const NB = r.val;
   ok("a fix nagy feladatok száma " + NB, r.val === 14);
   r = await ev("typeof FELADAT_TIPUSOK");
   ok("a régi választható lista eltűnt", r.val === "undefined");
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("mind a 20 kártya renderelve", r.val === 20);
+  ok("mind a 21 kártya renderelve", r.val === 21);
 
   /* --- MINDEN projektnél megvan MINDEN nagy blokk --- */
   r = await ev("PROJEKTEK.every(p=>(p.hatralevo||[]).length===NAGY_FELADATOK.length)");
@@ -147,7 +147,7 @@ function get(p) {
   /* --- a kártyán a haladás --- */
   await ev("closeDetail()");
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("a bezárás után a rács újrarajzolódik", r.val === 20);
+  ok("a bezárás után a rács újrarajzolódik", r.val === 21);
   r = await ev("Array.from(document.querySelectorAll('#grid .card')).some(c=>/\\d+\\/\\d+ feladat/.test(c.textContent))");
   ok("a kártyán látszik a kész/összes nagy feladat", r.val === true);
   r = await ev("Array.from(document.querySelectorAll('#grid .card')).some(c=>c.textContent.includes('hátra'))");
@@ -157,7 +157,7 @@ function get(p) {
   await send("Page.navigate", { url: "http://localhost:8903/index.html" });
   await new Promise(r => setTimeout(r, 2200));
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("újratöltés után is 20 kártya", r.val === 20);
+  ok("újratöltés után is 21 kártya", r.val === 21);
   await ev("openDetail('vizsgaztato-ai')");
   r = await ev("document.querySelectorAll('#tasks .blk').length");
   ok("újratöltés után a blokkok megvannak (" + r.val + ")", r.val === NB);
@@ -235,7 +235,7 @@ function get(p) {
   r = await ev("document.getElementById('grid').style.display !== 'none' && document.getElementById('guide').style.display === 'none'");
   ok("vissza lehet váltani a kártyákra", r.val === true);
   r = await ev("document.querySelectorAll('#grid .card').length");
-  ok("a kártyák érintetlenek (" + r.val + ")", r.val === 20);
+  ok("a kártyák érintetlenek (" + r.val + ")", r.val === 21);
   r = await ev("document.getElementById('search').style.display !== 'none'");
   ok("a kereső újra látható", r.val === true);
 

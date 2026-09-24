@@ -994,5 +994,161 @@ Egyetlen önálló HTML fájl, külső függőség nélkül (offline is fut). A 
       { feladat: "Árazás", kesz: false },
       { feladat: "Partnerkapcsolat", kesz: false }
     ]
+  },
+
+  {
+    "id": "pacsi-dogsclaude",
+    "nev": "Pacsi — kutyás élményvilág",
+    "url": "https://sabolo100.github.io/DogsClaude/",
+    "statusz": "elinditott",
+    "kategoria": "Fogyasztói web / Állat",
+    "rovid": "Kutyabarát helyek és szolgáltatások egy helyen — szombaton indul a marketing.",
+    "leiras": "A **Pacsi** egy kutyásoknak szóló élmény- és szolgáltatásiránytű. Az alapgondolat: a kutyatartó gazdi nem külön-külön keresi a kutyabarát kávézókat, sétáltatókat, kutyafodrászt, panziót és programokat — hanem **egy helyen** találja meg mindazt, ami a kutyájával kapcsolatos.\n\n## Mi ez pontosan\n\nEgy könnyű, mobilbarát weboldal, amely kategóriákra bontva gyűjti a kutyás élethelyzeteket és a hozzájuk tartozó helyeket/szolgáltatókat:\n\n- **Kutyabarát helyek** — éttermek, kávézók, szállások, kirándulóhelyek, ahol a kutya is szívesen látott vendég.\n- **Szolgáltatások** — sétáltatás, kutyapanzió, fodrász, kozmetika, tréning, állatorvos.\n- **Programok és élmények** — kutyás események, találkozók, versenyek.\n- **Közösség** — hasznos tippek, tapasztalatok, értékelések.\n\nA név és a hangvétel szándékosan barátságos, „gazdi-barát\" — nem egy merev katalógus, hanem egy kutyás életérzés köré épülő felület.\n\n## Mire jó\n\n- **Gazdiknak:** időt spórol, mert egy helyen találják meg, mi hova vihető a kutyával.\n- **Szolgáltatóknak és helyeknek:** ingyenes vagy fizetett megjelenés, közvetlen elérésük a kutyás célközönséghez.\n- **Kommunikációs szempontból:** remek „jópofa\" tartalom-marketing eszköz a DarwinAI szolgáltatásaihoz — pontosan az a típus, amit az emberek szívesen megosztanak.\n\n## Státusz\n\n- A weboldal **készen van** és élesben fut: 🔗 https://sabolo100.github.io/DogsClaude/\n- **A marketing szombaton (2026-09-26) indul** — vagyis a láthatóság és a terjesztés most kezdődik, nem a fejlesztés.\n\n## Következő lépések\n\n- Marketing indulás (szombat) figyelése, első eredmények mérése.\n- Tartalomnaptár: heti 2-3 megosztható kutyás tipp / helyajánló.\n- Szolgáltatói adatbázis bővítése (első körben Budapest és környéke).\n- Kapcsolódó: DarwinAI (tartalom-marketing modell), ARworks (webes kivitelezés).\n\n🔗 **Kapcsolódó:** DarwinAI kommunikációs modell — az ötletek egy része nem termék, hanem a DarwinAI-ra vezető figyelemfelkeltő tartalom. A Pacsi ennek a mintának tiszta példája.",
+    "hatralevo": [
+      {
+        "feladat": "Teljes speckó",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Kategóriastruktúra és szűrők véglegesítése",
+            "kesz": false
+          },
+          {
+            "szoveg": "Szolgáltatói adatmodell (hely, elérhetőség, nyitvatartás, értékelés)",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Üzleti modell",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Ingyenes alapmegjelenés + kiemelt (fizetett) szolgáltatói csomag",
+            "kesz": false
+          },
+          {
+            "szoveg": "Helyi partneri együttműködések (kutyabarát helyek)",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Kész szoftver",
+        "kesz": true
+      },
+      {
+        "feladat": "Publikálás",
+        "kesz": true,
+        "reszfeladatok": [
+          {
+            "szoveg": "Élesítés GitHub Pages-en",
+            "kesz": true
+          }
+        ]
+      },
+      {
+        "feladat": "Láthatóság maximalizálás",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Megosztható tartalmak: kutyás tippek, helyajánlók, videók",
+            "kesz": false
+          },
+          {
+            "szoveg": "Közösségi felületek (Facebook-csoportok, Instagram)",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Sales",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Kutyabarát helyek és szolgáltatók közvetlen megkeresése",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Marketing",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Indulás: 2026-09-26 (szombat)",
+            "kesz": false
+          },
+          {
+            "szoveg": "Induló kampány: ismertség + első szolgáltatói megkeresések",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "SEO",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Kulcsszavak: kutyabarát helyek, kutyapanzió, kutyás programok",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "eDM / hírlevél",
+        "kesz": false
+      },
+      {
+        "feladat": "Hirdetés (Ads)",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Meta/Google hirdetés teszt a kutyás célközönségre",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Tartalom / blog",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Heti 2-3 megosztható kutyás tipp / helyajánló",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Jogi / adatvédelem",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Adatkezelési tájékoztató és felhasználási feltételek",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Árazás",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Kiemelt megjelenés csomagárak",
+            "kesz": false
+          }
+        ]
+      },
+      {
+        "feladat": "Partnerkapcsolat",
+        "kesz": false,
+        "reszfeladatok": [
+          {
+            "szoveg": "Kutyás egyesületek, menhelyek, kutyaiskolák bevonása",
+            "kesz": false
+          }
+        ]
+      }
+    ]
   }
 ];
